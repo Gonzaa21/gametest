@@ -3,8 +3,8 @@ use bevy::prelude::*;
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Default, States)]
 pub enum AppState {
     #[default]
-    MainMenu,
-    Setup,
+    MainMenu, // game menu
+    Setup, // in game
     PlayerTurn,
     RoundEnd
 }

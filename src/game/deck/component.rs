@@ -1,6 +1,6 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Entity};
 
 #[derive(Component)]
 pub struct Deck {
-    pub cards_values: Vec<u8>
+    pub cards_values: Vec<Entity>
 }
