@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-
 use crate::game::{deck::system::spawn_cards, gamestate::AppState};
 pub mod component;
 mod system;

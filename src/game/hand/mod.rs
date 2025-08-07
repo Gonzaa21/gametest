@@ -1,10 +1,12 @@
-// use bevy::prelude::*;
+use bevy::prelude::*;
+use crate::game::{hand::system::deal_initial_hands, gamestate::AppState};
 pub mod component;
+mod system;
 
 pub struct HandPlugin;
 
-// impl Plugin for HandPlugin {
-//     fn build(&self, app: &mut App) {
-//         app.
-//     }
-// }
+impl Plugin for HandPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(OnEnter(AppState::Setup), deal_initial_hands);
+    }
+}
