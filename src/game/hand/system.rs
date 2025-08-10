@@ -15,7 +15,7 @@ pub fn deal_initial_hands (
     let mut deck = match deck_query.single_mut() {
         Ok(d) => d,
         Err(_) => {
-            error!("❌ deck not founded.");
+            error!(target: "mygame","❌ deck not founded.");
             return;
         }
     };
@@ -23,7 +23,7 @@ pub fn deal_initial_hands (
     // verify if player have 4 cards
     for player_entity in player_query.iter() {
         if deck.cards_values.len() < 4 {
-            warn!("⚠️ There are not enough cards for this player");
+            warn!(target: "mygame","⚠️ There are not enough cards for this player");
             continue;
         }
 

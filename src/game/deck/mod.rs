@@ -6,6 +6,10 @@ pub struct DeckPlugin;
 
 impl Plugin for DeckPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::Setup), spawn_cards);
+        app.add_systems(OnEnter(AppState::Setup), spawn_cards.in_set(DeckSet));
     }
 }
+
+// deckset
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct DeckSet;
