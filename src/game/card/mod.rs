@@ -1,10 +1,13 @@
-// use bevy::prelude::*;
+use bevy::prelude::*;
 pub mod component;
+mod system;
 
+use crate::game::card::system::{setup_cards, card_face};
 pub struct CardPlugin;
 
-// impl Plugin for CardPlugin {
-//     fn build(&self, app: &mut App) {
-//         app.
-//     }
-// }
+impl Plugin for CardPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, setup_cards)
+        .add_systems(Update, card_face);
+    }
+}

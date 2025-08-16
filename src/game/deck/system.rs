@@ -2,22 +2,47 @@ use bevy::prelude::*;
 use rand::seq::SliceRandom;
 
 use super::component::Deck;
-use crate::game::card::{component::{Card, CardPosition}};
+use crate::game::card::{component::{Card, CardPosition, Suit, CardHandles, CardBack}};
 
-pub fn spawn_cards(mut commands: Commands) {
+pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_back: Res<CardBack>) {
+    let suits = [Suit::Coarse, Suit::Cup, Suit::Gold, Suit::Sword];
+
+    // generar todas las combinaciones de palo y valor
+    let mut cards: Vec<(Suit, u8)> = suits
+        .iter()
+        .flat_map(|suit| (1..=12).map(move |value| (suit.clone(), value)))
+        .collect();
+
+    // randomize cards
     let mut rng = rand::rng();
-    let mut card_values: Vec<u8> = (1..=12).flat_map(|n| std::iter::repeat(n).take(4)).collect(); // 12 values x4
-    card_values.shuffle(&mut rng); // randomize cards
+    cards.shuffle(&mut rng);
 
     // spawn card entities and save in Vec
     let mut card_entities = Vec::new();
-    for value in card_values {
-        let card_entity = commands.spawn(Card {
-            value,
-            face_up: false,
-            owner_id: None,
-            position: CardPosition::Deck
-        }).id();
+    for (suit, value) in cards {
+
+        let suit_idx = match suit {
+            Suit::Coarse => 0,
+            Suit::Cup    => 1,
+            Suit::Gold   => 2,
+            Suit::Sword  => 3,
+        };
+        let idx = suit_idx * 12 + (value as usize - 1);
+        let front = card_handles.0[idx].clone();
+
+        let handle = front;
+        let card_entity = commands.spawn((
+            Sprite::from_image(card_back.0.clone()),
+            Transform::from_xyz(0.0, 200.0, idx as f32),
+            Card {
+                suit,
+                value,
+                face_up: false,
+                owner_id: None,
+                position: CardPosition::Deck,
+                front_face: handle.clone()
+        })).id();
+
         card_entities.push(card_entity);
     }
 
