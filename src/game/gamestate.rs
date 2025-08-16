@@ -13,6 +13,6 @@ pub struct GameStatePlugin;
 
 impl Plugin for GameStatePlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(State::new(AppState::MainMenu));
+        app.init_state::<AppState>();
     }
 }
