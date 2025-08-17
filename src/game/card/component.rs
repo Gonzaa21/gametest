@@ -30,3 +30,6 @@ pub struct CardHandles(pub Vec<Handle<Image>>);
 
 #[derive(Resource)]
 pub struct CardBack(pub Handle<Image>);
+
+#[derive(Component)]
+pub struct Selected;

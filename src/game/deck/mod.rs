@@ -2,6 +2,10 @@ use bevy::prelude::*;
 use crate::game::{deck::system::spawn_cards, gamestate::AppState};
 pub mod component;
 mod system;
+
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct DeckSet;
+
 pub struct DeckPlugin;
 
 impl Plugin for DeckPlugin {
@@ -11,5 +15,3 @@ impl Plugin for DeckPlugin {
 }
 
 // deckset
-#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-pub struct DeckSet;

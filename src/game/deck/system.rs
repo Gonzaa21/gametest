@@ -33,7 +33,7 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_
         let handle = front;
         let card_entity = commands.spawn((
             Sprite::from_image(card_back.0.clone()),
-            Transform::from_xyz(0.0, 200.0, idx as f32),
+            Transform::from_xyz(150.0, 50.0, idx as f32),
             Card {
                 suit,
                 value,

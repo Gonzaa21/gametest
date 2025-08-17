@@ -1,4 +1,6 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Entity};
 
 #[derive(Component)]
-pub struct Graveyard {}
+pub struct Graveyard {
+    pub cards: Vec<Entity>
+}

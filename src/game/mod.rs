@@ -26,7 +26,7 @@ impl Plugin for GamePlugin {
         .add_plugins(GameStatePlugin)
         .add_plugins(PlayerPlugin)
         .add_plugins(HandPlugin)
-        // .add_plugins(GraveyardPlugin)
+        .add_plugins(GraveyardPlugin)
         .add_plugins(DeckPlugin)
         .add_plugins(CardPlugin)
         // .add_plugins(BoardslotPlugin)
