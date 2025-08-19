@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
+use crate::game::{hand::component::Hand, graveyard::component::Graveyard, turnPlayer::component::Turn, player::component::Player};
 use rand::seq::SliceRandom;
 use rand::rng;
 
@@ -63,10 +64,14 @@ pub fn card_selection(
     mouse_input: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    card_query: Query<(Entity, &Transform), With<Card>>,
+    mut card_query: Query<(Entity, &mut Transform, &mut Card), With<Card>>,
     selected_query: Query<Entity, With<Selected>>,
     mut double_click: ResMut<DoubleClick>,
-    time: Res<Time>
+    time: Res<Time>,
+    turn_query: Res<Turn>,
+    mut hand_query: Query<&mut Hand>,
+    mut graveyard_query: Query<&mut Graveyard>,
+    player_query: Query<&Player>,
 ) {
     // if mouse input is not pressed
     if !mouse_input.just_pressed(MouseButton::Left) {
@@ -83,7 +88,7 @@ pub fn card_selection(
         if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
             
             // iterating for find clicked card
-            for (card_entity, card_transform) in card_query.iter() {
+            for (card_entity, card_transform, card_comp) in card_query.iter() {
                 let card_pos = card_transform.translation;
                 let card_size = Vec2::new(80.0, 120.0);
                 
@@ -108,7 +113,54 @@ pub fn card_selection(
 
                     if is_double_click {
                         info!(target: "mygame", "Double click");
-                        // Lógica de intercambio
+                        
+                        // verify: clicked card is in the player's hand
+                        let clicked_card = card_query.iter()
+                            .find(|(entity, _, _)| *entity == card_entity)
+                            .map(|(_, _, card)| card);
+
+                        if let Some(clicked_card) = clicked_card {
+                            // verify: card is inside the hand
+                            if !matches!(clicked_card.position, CardPosition::Hand(player_id) if player_id == turn_query.current_player) {
+                                info!(target: "mygame", "Card is not in current player's hand");
+                                return;
+                            }
+
+                            // search the drawn card
+                            let drawn_card = card_query.iter()
+                                .find(|(_, _, card)| matches!(card.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player));
+
+                            if drawn_card.is_none() { // if it was not found
+                                info!(target: "mygame", "No drawn card found for current player");
+                                return;
+                            }
+
+                            // obtain drawn_card entity and original position card
+                            let drawn_card_entity = drawn_card.unwrap().0; // .0 indicate the first parameter (Entity)
+                            let clicked_card_transform = *card_transform;
+
+                            // exchange positions
+                            if let Ok([(_, mut drawn_transform, mut drawn_card), (_, mut clicked_transform, mut clicked_card)]) = 
+                                card_query.get_many_mut([drawn_card_entity, card_entity]) {
+
+                                drawn_card.position = CardPosition::Hand(turn_query.current_player); // drawn card to hand
+                                drawn_card.face_up = false; // card back
+                                *drawn_transform = clicked_card_transform; // copy position
+
+                                clicked_card.position = CardPosition::Graveyard; // card of hand selected to graveyard
+                                clicked_card.face_up = true; // card front
+
+                                if let Ok(mut graveyard) = graveyard_query.single_mut() {
+                                    graveyard.cards.push(card_entity); // update changes
+
+                                    clicked_transform.translation = Vec3::new(-150.0, 50.0, graveyard.cards.len() as f32); // position in graveyard
+
+                                    // DEBUG
+                                    info!(target: "mygame", "Card swap completed: {:?} -> Hand, {:?} -> Graveyard", 
+                                          drawn_card_entity, card_entity);
+                                }
+                            }
+                        }
                     } else {
                         // update resource
                         double_click.last_card = Some(card_entity);
