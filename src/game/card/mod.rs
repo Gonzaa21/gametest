@@ -2,12 +2,13 @@ use bevy::prelude::*;
 pub mod component;
 mod system;
 
-use crate::game::card::system::{setup_cards, card_face, card_selection, card_visual};
+use crate::game::card::{component::DoubleClick, system::{card_face, card_selection, card_visual, setup_cards}};
 pub struct CardPlugin;
 
 impl Plugin for CardPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_cards)
-        .add_systems(Update, (card_face, card_selection, card_visual));
+        .add_systems(Update, (card_face, card_selection, card_visual))
+        .insert_resource(DoubleClick { last_card: None, last_click_time: 0.0, time_limit: 0.4 });
     }
 }

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected};
+use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
 use rand::seq::SliceRandom;
 use rand::rng;
 
@@ -65,6 +65,8 @@ pub fn card_selection(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     card_query: Query<(Entity, &Transform), With<Card>>,
     selected_query: Query<Entity, With<Selected>>,
+    mut double_click: ResMut<DoubleClick>,
+    time: Res<Time>
 ) {
     // if mouse input is not pressed
     if !mouse_input.just_pressed(MouseButton::Left) {
@@ -91,16 +93,39 @@ pub fn card_selection(
                 && world_pos.y >= card_pos.y - card_size.y / 2.0
                 && world_pos.y <= card_pos.y + card_size.y / 2.0 {
                     
-                    // deselect all cards
-                    for selected_entity in selected_query.iter() {
-                        commands.entity(selected_entity).remove::<Selected>();
-                    }
+                    let current_time = time.elapsed_secs(); // obtain current time
+                    let mut is_double_click = false;
                     
-                    // select only this card
-                    commands.entity(card_entity).insert(Selected);
-                    info!(target: "mygame", "Card clicked: {:?} at {:?}", card_entity, card_pos);
+                    // compare if last_card is card_entity
+                    if let Some(last_card) = double_click.last_card {
+                        if last_card == card_entity {
+                            let time_diff = current_time - double_click.last_click_time; // obtain time difference
+                            if time_diff <= double_click.time_limit {
+                                is_double_click = true;
+                            }
+                        }
+                    }
+
+                    if is_double_click {
+                        info!(target: "mygame", "Double click");
+                        // Lógica de intercambio
+                    } else {
+                        // update resource
+                        double_click.last_card = Some(card_entity);
+                        double_click.last_click_time = current_time;
+
+                        // deselect all cards
+                        for selected_entity in selected_query.iter() {
+                            commands.entity(selected_entity).remove::<Selected>();
+                        }
+
+                        // select only this card
+                        commands.entity(card_entity).insert(Selected);
+                        info!(target: "mygame", "Card clicked: {:?} at {:?}", card_entity, card_pos);
+                    }
                     break;
                 }
+                
             }
         }
     }
