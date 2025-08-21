@@ -7,7 +7,7 @@ use crate::game::card::{component::{Card, CardPosition, Suit, CardHandles, CardB
 pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_back: Res<CardBack>) {
     let suits = [Suit::Coarse, Suit::Cup, Suit::Gold, Suit::Sword];
 
-    // generar todas las combinaciones de palo y valor
+    // generate all combinations (suit-value)
     let mut cards: Vec<(Suit, u8)> = suits
         .iter()
         .flat_map(|suit| (1..=12).map(move |value| (suit.clone(), value)))
@@ -33,7 +33,7 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_
         let handle = front;
         let card_entity = commands.spawn((
             Sprite::from_image(card_back.0.clone()),
-            Transform::from_xyz(150.0, 50.0, idx as f32),
+            Transform::from_xyz(150.0, 50.0, idx as f32).with_scale(Vec3::splat(1.0)),
             Card {
                 suit,
                 value,

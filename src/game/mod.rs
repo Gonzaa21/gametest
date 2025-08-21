@@ -6,7 +6,6 @@ pub mod hand;
 pub mod graveyard;
 pub mod deck;
 pub mod card;
-pub mod boardslot;
 pub mod turnPlayer;
 
 use gamestate::GameStatePlugin;
@@ -15,7 +14,6 @@ use hand::HandPlugin;
 use graveyard::GraveyardPlugin;
 use deck::DeckPlugin;
 use card::CardPlugin;
-use boardslot::BoardslotPlugin;
 use turnPlayer::TurnPlugin;
 
 pub struct GamePlugin;
@@ -29,7 +27,6 @@ impl Plugin for GamePlugin {
         .add_plugins(GraveyardPlugin)
         .add_plugins(DeckPlugin)
         .add_plugins(CardPlugin)
-        // .add_plugins(BoardslotPlugin)
         .add_plugins(TurnPlugin);
     }
 }

@@ -19,7 +19,6 @@ pub enum CardPosition {
     Deck,
     Hand(Entity),
     Graveyard,
-    BoardSlot(Entity),
     DrawnCard(Entity)
 }
 

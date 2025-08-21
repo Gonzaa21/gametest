@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
 use crate::game::{hand::component::Hand, graveyard::component::Graveyard, turnPlayer::component::Turn, player::component::Player};
+use bevy::asset::Assets;
+use bevy::image::{Image, ImageSampler};
 use rand::seq::SliceRandom;
 use rand::rng;
 
@@ -88,7 +90,7 @@ pub fn card_selection(
         if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
             
             // iterating for find clicked card
-            for (card_entity, card_transform, card_comp) in card_query.iter() {
+            for (card_entity, card_transform, _card_comp) in card_query.iter() {
                 let card_pos = card_transform.translation;
                 let card_size = Vec2::new(80.0, 120.0);
                 
@@ -200,5 +202,26 @@ pub fn card_visual(
                 }
             }
         }
+    }
+}
+
+pub fn configure_texture(
+    mut images: ResMut<Assets<Image>>,
+    card_handles: Option<Res<CardHandles>>,
+    card_back: Option<Res<CardBack>>,
+) {
+    let Some(card_handles) = card_handles else { return; };
+    let Some(card_back) = card_back else { return; };
+    
+    // front cards
+    for handle in &card_handles.0 {
+        if let Some(image) = images.get_mut(handle) {
+            image.sampler = ImageSampler::nearest();
+        }
+    }
+    
+    // back card
+    if let Some(image) = images.get_mut(&card_back.0) {
+        image.sampler = ImageSampler::nearest();
     }
 }
