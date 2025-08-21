@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
-use crate::game::{hand::component::Hand, graveyard::component::Graveyard, turnPlayer::component::Turn, player::component::Player};
+use crate::game::{hand::component::Hand, graveyard::component::Graveyard, turnPlayer::component::Turn, player::component::Player, deck::component::Deck};
 use bevy::asset::Assets;
 use bevy::image::{Image, ImageSampler};
 use rand::seq::SliceRandom;
@@ -71,9 +71,10 @@ pub fn card_selection(
     mut double_click: ResMut<DoubleClick>,
     time: Res<Time>,
     turn_query: Res<Turn>,
-    mut hand_query: Query<&mut Hand>,
+    mut _hand_query: Query<&mut Hand>,
     mut graveyard_query: Query<&mut Graveyard>,
-    player_query: Query<&Player>,
+    _player_query: Query<&Player>,
+    mut deck_query: Query<&mut Deck>,
 ) {
     // if mouse input is not pressed
     if !mouse_input.just_pressed(MouseButton::Left) {
@@ -99,6 +100,24 @@ pub fn card_selection(
                 && world_pos.x <= card_pos.x + card_size.x / 2.0
                 && world_pos.y >= card_pos.y - card_size.y / 2.0
                 && world_pos.y <= card_pos.y + card_size.y / 2.0 {
+
+                    // condition to discard directly to graveyard if is clicked
+                    if matches!(_card_comp.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
+                        if let Ok((_, mut card_transform, mut card_comp)) = card_query.get_mut(card_entity) {
+                            card_comp.position = CardPosition::Graveyard;
+                            card_comp.face_up = true;
+
+                            // update graveyard
+                            if let Ok(mut graveyard) = graveyard_query.single_mut() {
+                                graveyard.cards.push(card_entity);
+                                
+                                card_transform.translation = Vec3::new(-150.0, 50.0, graveyard.cards.len() as f32);
+                                
+                                info!(target: "mygame", "Card discarded directly to graveyard: {:?}", card_entity);
+                            }
+                        }
+                        return;
+                    }
                     
                     let current_time = time.elapsed_secs(); // obtain current time
                     let mut is_double_click = false;
@@ -179,7 +198,47 @@ pub fn card_selection(
                     }
                     break;
                 }
-                
+            }
+
+            if !mouse_input.just_pressed(MouseButton::Left) { return; }
+            if let Some(cursor_pos) = window.cursor_position() {
+                if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
+                    let deck_pos = Vec3::new(150.0, 50.0, 0.0);
+                    let deck_size = Vec2::new(80.0, 120.0);
+
+                    if world_pos.x >= deck_pos.x - deck_size.x / 2.0 
+                    && world_pos.x <= deck_pos.x + deck_size.x / 2.0
+                    && world_pos.y >= deck_pos.y - deck_size.y / 2.0
+                    && world_pos.y <= deck_pos.y + deck_size.y / 2.0 {
+            
+                        let mut deck = match deck_query.single_mut() {
+                            Ok(d) => d,
+                            Err(_) => {
+                                warn!(target: "mygame", "No deck found");
+                                return;
+                            }
+                        };
+                    
+                        // verify if have cards in deck
+                        if deck.cards_values.is_empty() {
+                            warn!(target: "mygame", "Deck is empty");
+                            return;
+                        }
+                    
+                        let drawn_card_entity = deck.cards_values.remove(0); // first card of the deck
+                    
+                        if let Ok((_, mut transform, mut card)) = card_query.get_mut(drawn_card_entity) {
+                            card.position = CardPosition::DrawnCard(turn_query.current_player);
+                            card.owner_id = Some(turn_query.current_player);
+                            card.face_up = true; // show card taken
+
+                            // card taken position
+                            transform.translation = Vec3::new(0.0, -100.0, 30.0);
+
+                            info!(target: "mygame", "Player {:?} drew card: {:?}", turn_query.current_player, drawn_card_entity);
+                        }
+                    }
+                }
             }
         }
     }
