@@ -11,6 +11,7 @@ pub fn start_turn_system(
     if let Some(first_player) = players.iter().next() {
         commands.insert_resource(Turn {
             current_player: first_player,
+            has_drawn_card: false,
         });
         next_state.set(AppState::PlayerTurn);
         info!(target: "mygame","Shift started for player: {:?}", first_player);
@@ -31,6 +32,7 @@ pub fn next_turn_system(
         if let Some(pos) = players_vec.iter().position(|&p| p == turn.current_player) {
             let next_index = (pos + 1) % players_vec.len();
             turn.current_player = players_vec[next_index];
+            turn.has_drawn_card = false;
             info!(target: "mygame","Shift changed to player: {:?}", turn.current_player);
         }
 

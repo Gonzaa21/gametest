@@ -16,3 +16,10 @@
 # por hacer partes del programa
 - hacer todo el menu de juego
 - hacerlo multijugador y solitario (IAs)
+
+# por hacer errores
+---
+
+# dependencia
+- uso de rustdoc para generar documentacion
+- uso de crate para ver el rendimiento
