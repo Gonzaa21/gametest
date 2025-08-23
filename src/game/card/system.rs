@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
-use crate::game::{hand::component::Hand, graveyard::component::Graveyard, turnPlayer::component::Turn, player::component::Player, deck::component::Deck};
+use crate::game::{graveyard::component::Graveyard, turnPlayer::component::Turn, deck::component::Deck};
 use bevy::asset::Assets;
 use bevy::image::{Image, ImageSampler};
 use rand::seq::SliceRandom;
@@ -79,10 +79,9 @@ pub fn card_selection(
     selected_query: Query<Entity, With<Selected>>,
     mut double_click: ResMut<DoubleClick>,
     time: Res<Time>,
-    mut turn_query: ResMut<Turn>,
-    mut hand_query: Query<&mut Hand>,
+    turn_query: ResMut<Turn>,
     mut graveyard_query: Query<&mut Graveyard>,
-    mut deck_query: Query<&mut Deck>,
+    deck_query: Query<&mut Deck>,
 ) {
     if !mouse_input.just_pressed(MouseButton::Left) {
         return;
@@ -100,18 +99,18 @@ pub fn card_selection(
         return;
     }
 
+    // detect click in graveyard 
+    if detect_graveyard_click(world_pos) {
+        handle_graveyard_click(graveyard_query, turn_query, &mut card_query);
+        return;
+    }
+
     // detect click in hand
     if let Some(clicked_entity) = detect_card_click(&card_query, world_pos) {
         handle_card_click(
             clicked_entity, &mut commands, &selected_query, &mut double_click,
             &time, &turn_query, &mut card_query, &mut graveyard_query
         );
-        return;
-    }
-
-    // detect click in graveyard 
-    if detect_graveyard_click(world_pos) {
-        handle_graveyard_click(graveyard_query, turn_query, &mut card_query);
         return;
     }
 }

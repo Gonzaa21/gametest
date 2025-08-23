@@ -3,6 +3,7 @@ use crate::game::{deck::system::spawn_cards, gamestate::AppState};
 pub mod component;
 mod system;
 
+// deckset
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 pub struct DeckSet;
 
@@ -13,5 +14,3 @@ impl Plugin for DeckPlugin {
         app.add_systems(OnEnter(AppState::Setup), spawn_cards.in_set(DeckSet));
     }
 }
-
-// deckset

@@ -1,10 +1,9 @@
 # por hacer sistemas
-- hacer mazo clickeable + descarte directo
 - sistema de cartas especiales
 
 # por hacer UI
 - background del juego
-- botones (end/exit)
+- botones (end round/exit game)
 - scoreboard
 - uso del state RoundEnd
 
@@ -23,3 +22,6 @@
 # dependencia
 - uso de rustdoc para generar documentacion
 - uso de crate para ver el rendimiento
+
+_- Al terminar la mecanica básica del juego, ordenar codigo y agregar documentación -_
+__- Más que nada organizar en card/systems y card/component-__
