@@ -61,9 +61,15 @@ pub fn prepare_new_round(
     card_query: Query<Entity, With<Card>>,
     deck_query: Query<Entity, With<Deck>>,
     graveyard_query: Query<Entity, With<Graveyard>>,
-    hand_query: Query<Entity, With<Hand>>,
+    mut hand_query: Query<&mut Hand>,
 ) {
     if keyboard.just_pressed(KeyCode::KeyN) {
+
+        // reset player hands
+        for mut hand in hand_query.iter_mut() {
+            hand.cards.clear(); // clean hand
+            info!(target: "mygame", "Hand cleared");
+        }
 
         // despawn cards, deck, graveyard
         for entity in card_query.iter() {
@@ -74,13 +80,6 @@ pub fn prepare_new_round(
         }
         for entity in graveyard_query.iter() {
             commands.entity(entity).despawn();
-        }
-
-        // reset player hands
-        for entity in hand_query.iter() {
-            if let Ok(mut hand) = commands.get_entity(entity) {
-                hand.insert(Hand { cards: Vec::new() });
-            }
         }
 
         turn.has_drawn_card = false;

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
-use crate::game::{graveyard::component::Graveyard, turnPlayer::component::Turn, deck::component::Deck};
+use crate::game::{graveyard::component::Graveyard, turnPlayer::component::Turn, deck::component::Deck, hand::component::Hand, player::component::Player};
 use bevy::asset::Assets;
 use bevy::image::{Image, ImageSampler};
 use rand::seq::SliceRandom;
@@ -79,8 +79,10 @@ pub fn card_selection(
     mut double_click: ResMut<DoubleClick>,
     time: Res<Time>,
     turn_query: ResMut<Turn>,
+    mut hand_query: Query<&mut Hand>,
     mut graveyard_query: Query<&mut Graveyard>,
     deck_query: Query<&mut Deck>,
+    player_query: Query<(Entity, &Player)>,
 ) {
     if !mouse_input.just_pressed(MouseButton::Left) {
         return;
@@ -108,7 +110,7 @@ pub fn card_selection(
     if let Some(clicked_entity) = detect_card_click(&card_query, world_pos) {
         handle_card_click(
             clicked_entity, &mut commands, &selected_query, &mut double_click,
-            &time, &turn_query, &mut card_query, &mut graveyard_query
+            &time, &turn_query, &mut card_query, &mut graveyard_query, &player_query, &mut hand_query
         );
         return;
     }
@@ -205,6 +207,8 @@ fn handle_card_click(
     turn_query: &ResMut<Turn>,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
     graveyard_query: &mut Query<&mut Graveyard>,
+    player_query: &Query<(Entity, &Player)>,
+    hand_query: &mut Query<&mut Hand>,
 ) {
     // verify: if it is direct discard
     let card_comp = card_query.iter()
@@ -232,7 +236,7 @@ fn handle_card_click(
     }
 
     if is_double_click {
-        card_swap(clicked_entity, card_query, graveyard_query, turn_query);
+        card_swap(clicked_entity, card_query, graveyard_query, turn_query, hand_query, player_query);
     } else {
         // selection component
         for selected_entity in selected_query.iter() {
@@ -363,6 +367,8 @@ fn card_swap(
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
     graveyard_query: &mut Query<&mut Graveyard>,
     turn_query: &ResMut<Turn>,
+    hand_query: &mut Query<&mut Hand>,
+    player_query: &Query<(Entity, &Player)>
 ) {
     let clicked_card = card_query.iter()
         .find(|(entity, _, _)| *entity == clicked_entity)
@@ -403,6 +409,15 @@ fn card_swap(
                 graveyard.cards.push(clicked_entity); // update changes
                 clicked_transform.translation = Vec3::new(-150.0, 50.0, graveyard.cards.len() as f32); // position in graveyard
                 
+                if let Some((_, player)) = player_query.iter().find(|(entity, _)| *entity == turn_query.current_player) {
+                    if let Ok(mut hand) = hand_query.get_mut(player.hand) {
+                        // remove hand
+                        hand.cards.retain(|&card_entity| card_entity != clicked_entity);
+                        // add new card in hand
+                        hand.cards.push(drawn_card_entity);
+                    }
+                }
+
                 info!(target: "mygame", "Card swap completed: {:?} -> Hand, {:?} -> Graveyard", drawn_card_entity, clicked_entity);
             }
         }
