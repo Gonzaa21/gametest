@@ -25,6 +25,7 @@ pub fn next_turn_system(
     mut turn: ResMut<Turn>,
     players: Query<Entity, With<Player>>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
     if keyboard.just_pressed(KeyCode::Space) {
         let players_vec: Vec<Entity> = players.iter().collect();
@@ -35,8 +36,10 @@ pub fn next_turn_system(
             turn.has_drawn_card = false;
             info!(target: "mygame","Shift changed to player: {:?}", turn.current_player);
         }
-
-        // si presionan "ronda terminada":
-        // next_state.set(AppState::RoundEnd);
+    }
+    
+    if keyboard.just_pressed(KeyCode::KeyR) {
+            next_state.set(AppState::RoundEnd);
+            info!(target: "mygame", "Round ended by player!");
     }
 }

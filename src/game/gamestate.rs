@@ -5,8 +5,8 @@ pub enum AppState {
     #[default]
     MainMenu, // game menu
     Setup, // in game
-    PlayerTurn,
-    RoundEnd
+    PlayerTurn, // local player turn
+    RoundEnd // end button
 }
 
 pub fn transition_to_setup(

@@ -21,14 +21,13 @@ pub fn setup_cards(mut commands: Commands, asset_server: Res<AssetServer>) {
     }
 
     // load textures
-    let mut card_handles: Vec<Handle<Image>> = card_routes
+    let card_handles: Vec<Handle<Image>> = card_routes
         .into_iter()
         .map(|route| asset_server.load(route))
         .collect();
 
     // card back texture
     let card_back_handle = asset_server.load("textures/deck/back/back.PNG");
-    card_handles.shuffle(&mut rng());
 
     // insert handles resources
     commands.insert_resource(CardHandles(card_handles.clone()));
