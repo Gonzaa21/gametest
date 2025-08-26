@@ -6,7 +6,7 @@ pub mod hand;
 pub mod graveyard;
 pub mod deck;
 pub mod card;
-pub mod turnPlayer;
+pub mod turn_player;
 pub mod round_end;
 
 use gamestate::GameStatePlugin;
@@ -15,7 +15,7 @@ use hand::HandPlugin;
 use graveyard::GraveyardPlugin;
 use deck::DeckPlugin;
 use card::CardPlugin;
-use turnPlayer::TurnPlugin;
+use turn_player::TurnPlugin;
 use round_end::RoundEndPlugin;
 
 pub struct GamePlugin;

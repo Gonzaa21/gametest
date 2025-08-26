@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, gamestate::AppState, turnPlayer::component::Turn, graveyard::component::Graveyard, deck::component::Deck};
+use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, gamestate::AppState, turn_player::component::Turn, graveyard::component::Graveyard, deck::component::Deck};
 
 // Reveal all cards
 pub fn reveal_all_cards(

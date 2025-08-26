@@ -5,7 +5,6 @@
 - background del juego
 - botones (end round/exit game)
 - scoreboard
-- uso del state RoundEnd
 
 # por hacer Sprites
 - en Mazo y Pozo al apilar varias cartas que se muevan un poco a la derecha (efecto al apilar cartas)
@@ -25,3 +24,4 @@
 
 _- Al terminar la mecanica básica del juego, ordenar codigo y agregar documentación -_
 __- Más que nada organizar en card/systems y card/component-__
+>>> mover los handles y auxiliar a otra carpeta

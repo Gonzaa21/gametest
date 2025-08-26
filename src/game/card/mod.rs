@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 pub mod component;
 mod system;
+mod handles;
+mod utils;
 
 use crate::game::{card::{component::DoubleClick, system::{card_face, card_selection, card_visual, setup_cards, configure_texture}}, gamestate::AppState};
 pub struct CardPlugin;
