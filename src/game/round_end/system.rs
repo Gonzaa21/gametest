@@ -45,7 +45,7 @@ pub fn calculate_scores(
     }
     
     // search winner
-    if let Some((_winner_entity, winner_name, winner_score)) = scores.iter().min_by_key(|(_, _, score)| *score) {
+    if let Some((_, winner_name, winner_score)) = scores.iter().min_by_key(|(_, _, score)| *score) {
         info!(target: "mygame", "WINNER: {} with {} points!", winner_name, winner_score);
     }
     
