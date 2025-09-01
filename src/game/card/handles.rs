@@ -88,6 +88,7 @@ pub fn handle_deck_click(
         card.position = CardPosition::DrawnCard(turn_query.current_player);
         card.owner_id = Some(turn_query.current_player);
         card.face_up = true; // show card taken
+        card.from_deck = true; // card taken from deck
         
         transform.translation = Vec3::new(0.0, -100.0, 30.0); // card taken position
         turn_query.has_drawn_card = true; // player already drew a card
@@ -134,7 +135,8 @@ pub fn handle_graveyard_click(
         card.position = CardPosition::DrawnCard(turn_query.current_player);
         card.owner_id = Some(turn_query.current_player);
         card.face_up = true; // show card taken
-        
+        card.from_deck = false; // card not taken from deck
+
         transform.translation = Vec3::new(0.0, -100.0, 30.0); // card taken position
         turn_query.has_drawn_card = true; // player already drew a card
         info!(target: "mygame", "Player {:?} drew card: {:?}", turn_query.current_player, drawn_card_entity);

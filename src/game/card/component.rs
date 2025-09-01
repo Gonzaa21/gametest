@@ -8,7 +8,8 @@ pub struct Card {
     pub owner_id: Option<Entity>,
     pub position: CardPosition,
     pub suit: Suit,
-    pub front_face: Handle<Image>
+    pub front_face: Handle<Image>,
+    pub from_deck: bool
 }
 
 #[derive(Component)]

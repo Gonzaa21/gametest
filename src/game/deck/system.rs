@@ -40,7 +40,8 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_
                 face_up: false,
                 owner_id: None,
                 position: CardPosition::Deck,
-                front_face: handle.clone()
+                front_face: handle.clone(),
+                from_deck: false
         })).id();
 
         card_entities.push(card_entity);
