@@ -4,12 +4,18 @@ use crate::game::gamestate::AppState;
 pub mod resource;
 mod effect;
 mod system;
-use system::{detect_special_card};
+use system::{detect_special_card, handle_special_effects};
+use effect::{reveal_effect, shuffle_effect, swap_effect};
+use resource::SpecialCardEffect;
 
+// condition if card is special
+fn has_effect(effect: Option<Res<SpecialCardEffect>>) -> bool {
+    effect.is_some()
+}
 pub struct SpecialCardsPlugin;
 
 impl Plugin for SpecialCardsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (detect_special_card).run_if(in_state(AppState::PlayerTurn)));
+        app.add_systems(Update, (detect_special_card, (handle_special_effects,reveal_effect,shuffle_effect,swap_effect).run_if(has_effect)).run_if(in_state(AppState::PlayerTurn)));
     }
 }
