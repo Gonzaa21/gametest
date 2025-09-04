@@ -41,7 +41,8 @@ pub fn detect_special_card(
             let new_effect = SpecialCardEffect {
                 card_entity: Some(card_entity),
                 effect_type: Some(effect.clone()),
-                awaiting_target: matches!(effect, SpecialEffect::Shuffle | SpecialEffect::Swap)
+                awaiting_target: matches!(effect, SpecialEffect::Shuffle | SpecialEffect::Swap),
+                target_player: None
             };
             commands.insert_resource(new_effect);
             return;

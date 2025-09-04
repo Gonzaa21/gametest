@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Suit, Selected, DoubleClick};
-use crate::game::{graveyard::component::Graveyard, turn_player::component::Turn, deck::component::Deck, hand::component::Hand, player::component::Player};
+use crate::game::{graveyard::component::Graveyard, turn_player::component::Turn, deck::component::Deck, hand::component::Hand, player::component::Player, special_cards::resource::SpecialCardEffect};
 use crate::game::card::handles::{handle_deck_click, handle_card_click, handle_graveyard_click};
 use bevy::asset::Assets;
 use bevy::image::{Image, ImageSampler};
@@ -84,6 +84,7 @@ pub fn card_selection(
     mut graveyard_query: Query<&mut Graveyard>,
     deck_query: Query<&mut Deck>,
     player_query: Query<(Entity, &Player)>,
+    special_effect: Option<ResMut<SpecialCardEffect>>,
 ) {
     if !mouse_input.just_pressed(MouseButton::Left) {
         return;
@@ -94,6 +95,28 @@ pub fn card_selection(
     let Ok((camera, camera_transform)) = camera_query.single() else { return; };
     let Some(cursor_pos) = window.cursor_position() else { return; };
     let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else { return; };
+
+    // verify if it has special effect, run if awaiting_target = true
+    if let Some(mut effect) = special_effect {
+        if effect.awaiting_target {
+            if let Some(clicked_entity) = detect_card_click(&card_query, world_pos) {
+                // verify if clicked card belongs to the rival
+                if let Ok((_card_entity, _card_tr, card)) = card_query.get(clicked_entity) {
+                    if let CardPosition::Hand(hand_owner) = card.position {
+                        if hand_owner != turn_query.current_player {
+                            effect.target_player = Some(hand_owner);
+                            effect.awaiting_target = false;
+                            info!(target: "mygame", "Target player selected for special effect");
+                        } else {
+                            info!(target: "mygame", "Cannot target your own cards");
+                        }
+                    }
+                }
+                info!(target: "mygame", "Click on opponent's cards to select target");
+                return;
+            }
+        }
+    }
 
     // detect click in deck
     if detect_deck_click(world_pos) {

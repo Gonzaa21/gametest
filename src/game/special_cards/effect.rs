@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use rand::Rng;
+use rand::{Rng, seq::SliceRandom};
 use crate::game::{special_cards::resource::{SpecialCardEffect, SpecialEffect}, card::component::Card, hand::component::Hand, player::component::Player, turn_player::component::Turn};
 
 pub fn reveal_effect(
@@ -36,9 +36,15 @@ pub fn reveal_effect(
                     info!(target: "mygame", "Revealed card: {} of {:?}", card.value, card.suit);
                 }
             }
+
+            // reset from_deck so that the effect is used only once
+            if let Some(special_card_entity) = special_effect.card_entity {
+                if let Ok(mut special_card) = card_query.get_mut(special_card_entity) {
+                    special_card.from_deck = false;
+                }
+            }
         }
     }
-    
     // clean effect
     *special_effect = SpecialCardEffect::default();
     info!(target: "mygame", "Effect completed");
@@ -46,26 +52,101 @@ pub fn reveal_effect(
 
 pub fn shuffle_effect(
     special_effect: Option<ResMut<SpecialCardEffect>>,
+    mut card_query: Query<(Entity, &mut Transform, &mut Card), With<Card>>,
+    hand_query: Query<&Hand>,
+    player_query: Query<(Entity, &Player)>,
 ) {
     // run if effect type is shuffle
     if let Some(mut effect) = special_effect {
         if matches!(effect.effect_type, Some(SpecialEffect::Shuffle)) {
             
-            info!(target: "mygame", "Shuffle effect would execute here");
+            // verify do not expecting target
+            if effect.awaiting_target { return; }
+
+            // verify have target_player
+            let Some(target_player_id) = effect.target_player else {
+                *effect = SpecialCardEffect::default();
+                return;
+            };
+
+            // find target player
+            let target_player = player_query.iter()
+                .find(|(entity, _)| *entity == target_player_id);
+    
+            let Some((_, player)) = target_player else {
+                info!(target: "mygame", "Target player not found");
+                *effect = SpecialCardEffect::default();
+                return;
+            };
+
+            // find target player hand
+            let Ok(hand) = hand_query.get(player.hand) else {
+                info!(target: "mygame", "Target player hand not found");
+                *effect = SpecialCardEffect::default();
+                return;
+            };
+
+            // verify if have 4 cards in hand
+            if hand.cards.len() != 4 {
+                info!(target: "mygame", "Target player doesn't have 4 cards");
+                *effect = SpecialCardEffect::default();
+                return;
+            };
+
+            // verify card positions
+            let mut positions: Vec<Vec3> = Vec::new();
+            for &card_entity in &hand.cards {
+                if let Ok((_, transform, mut card)) = card_query.get_mut(card_entity) {
+                    positions.push(transform.translation); // push to Vec (positions)
+                    card.face_up = false;
+                }
+            }
+            
+            // randomize positions
+            let mut rng = rand::rng();
+            positions.shuffle(&mut rng);
+
+            // update card positions
+            for (i, &card_entity) in hand.cards.iter().enumerate() {
+               if let Ok((_, mut transform, _)) = card_query.get_mut(card_entity) {
+                   transform.translation = positions[i];
+               }
+            }
+
+            // reset from_deck so that the effect is used only once
+            if let Some(special_card_entity) = effect.card_entity {
+                if let Ok(mut special_card) = card_query.get_mut(special_card_entity) {
+                    special_card.2.from_deck = false;
+                }
+            }
+
+            info!(target: "mygame", "Cards shuffled for target player!");
+
             *effect = SpecialCardEffect::default();
+            info!(target: "mygame", "Effect completed");
         }
     }
 }
 
 pub fn swap_effect(
     special_effect: Option<ResMut<SpecialCardEffect>>,
+    mut card_query: Query<&mut Card>,
 ) {
     // run if effect type is swap
     if let Some(mut effect) = special_effect {
         if matches!(effect.effect_type, Some(SpecialEffect::Swap)) {
             
-            info!(target: "mygame", "Swap effect would execute here");
+            
+
+            // reset from_deck so that the effect is used only once
+            if let Some(special_card_entity) = effect.card_entity {
+                if let Ok(mut special_card) = card_query.get_mut(special_card_entity) {
+                    special_card.from_deck = false;
+                }
+            }
+
             *effect = SpecialCardEffect::default();
+            info!(target: "mygame", "Effect completed");
         }
     }
 }

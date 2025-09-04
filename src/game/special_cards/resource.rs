@@ -5,6 +5,7 @@ pub struct SpecialCardEffect {
     pub card_entity: Option<Entity>,
     pub effect_type: Option<SpecialEffect>,
     pub awaiting_target: bool,
+    pub target_player: Option<Entity>
 }
 
 #[derive(Debug, Clone)]
