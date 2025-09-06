@@ -16,10 +16,11 @@
 - hacerlo multijugador y solitario (IAs)
 
 # por hacer errores
----
+terminar de agregar el swap
+agregar lo de macros para codigo repetitivo
 
 # dependencia
 - uso de rustdoc para generar documentacion
 - uso de crate para ver el rendimiento
 
-_- Al terminar la mecanica básica del juego, ordenar codigo y agregar documentación -_
+_- Al terminar la mecanica básica del juego, agregar documentación -_

@@ -42,7 +42,10 @@ pub fn detect_special_card(
                 card_entity: Some(card_entity),
                 effect_type: Some(effect.clone()),
                 awaiting_target: matches!(effect, SpecialEffect::Shuffle | SpecialEffect::Swap),
-                target_player: None
+                target_player: None,
+                target_card: None,
+                awaiting_own_card: matches!(effect, SpecialEffect::Swap),
+                own_card: None
             };
             commands.insert_resource(new_effect);
             return;
