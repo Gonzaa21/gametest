@@ -3,13 +3,14 @@ use rand::{Rng, seq::SliceRandom};
 use crate::game::{special_cards::resource::{SpecialCardEffect, SpecialEffect}, card::component::Card, hand::component::Hand, player::component::Player, turn_player::component::Turn};
 
 pub fn reveal_effect(
-    mut special_effect: ResMut<SpecialCardEffect>,
+    special_effect: Option<ResMut<SpecialCardEffect>>,
     mut card_query: Query<&mut Card>,
     hand_query: Query<&Hand>,
     player_query: Query<(Entity, &Player)>,
     turn_query: Res<Turn>,
 ) {
-    // run if effect type is reveal    
+    // run if effect type is reveal
+    let Some(mut special_effect) = special_effect else { return; };
     if !matches!(special_effect.effect_type, Some(SpecialEffect::Reveal)) {
         return;
     }
@@ -130,17 +131,61 @@ pub fn shuffle_effect(
 
 pub fn swap_effect(
     special_effect: Option<ResMut<SpecialCardEffect>>,
-    mut card_query: Query<&mut Card>,
+    mut card_query: Query<(Entity, &mut Transform, &mut Card), With<Card>>,
+    mut hand_query: Query<&mut Hand>,
+    player_query: Query<(Entity, &Player)>,
 ) {
     // run if effect type is swap
     if let Some(mut effect) = special_effect {
         if matches!(effect.effect_type, Some(SpecialEffect::Swap)) {
             
-            
+            // verify if have target_card (rival card) and own_card (own card)
+            if let (Some(target_card_entity), Some(own_card_entity)) = (effect.target_card, effect.own_card) {
+                if let Ok([(_, mut target_transform, mut target_card), (_, mut own_transform, mut own_card)]) =
+                    card_query.get_many_mut([target_card_entity, own_card_entity]) {
+                    
+                    // obtain positions and owner id
+                    let target_pos = target_transform.translation;
+                    let own_pos = own_transform.translation;
+                    let target_id = target_card.owner_id;
+                    let own_id = own_card.owner_id;
+
+                    // exchange positions, owner ids and no face_up
+                    target_transform.translation = own_pos;
+                    target_card.owner_id = own_id;
+                    target_card.face_up = false;
+                    own_transform.translation = target_pos;
+                    own_card.owner_id = target_id;
+                    own_card.face_up = false;
+
+                    // update and save changes of player hand with target_card
+                    if let Some((_, target_player)) = player_query.iter().find(|(entity, _)| Some(*entity) == target_id) {
+                        if let Ok(mut target_hand) = hand_query.get_mut(target_player.hand) {
+                            // remove target_card => add own_card
+                            target_hand.cards.retain(|&card_entity| card_entity != target_card_entity);
+                            target_hand.cards.push(own_card_entity);
+                        }
+                    }
+
+                    // update and save changes of player hand with own_card
+                    if let Some((_, own_player)) = player_query.iter().find(|(entity, _)| Some(*entity) == own_id) {
+                        if let Ok(mut own_hand) = hand_query.get_mut(own_player.hand) {
+                            // remove own_card => add target_card
+                            own_hand.cards.retain(|&card_entity| card_entity != own_card_entity);
+                            own_hand.cards.push(target_card_entity);
+                        }
+                    }
+                    
+                    info!(target: "mygame", "Card swap completed: {:?} -> {:?}", target_card_entity, own_card_entity);
+                }
+            } else {
+                info!(target: "mygame", "One more card needs to be selected");
+                return;
+            }
 
             // reset from_deck so that the effect is used only once
             if let Some(special_card_entity) = effect.card_entity {
-                if let Ok(mut special_card) = card_query.get_mut(special_card_entity) {
+                if let Ok((_, _, mut special_card)) = card_query.get_mut(special_card_entity) {
                     special_card.from_deck = false;
                 }
             }

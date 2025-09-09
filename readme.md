@@ -16,7 +16,6 @@
 - hacerlo multijugador y solitario (IAs)
 
 # por hacer errores
-terminar de agregar el swap
 agregar lo de macros para codigo repetitivo
 
 # dependencia
