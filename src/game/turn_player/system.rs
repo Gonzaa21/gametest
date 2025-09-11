@@ -21,23 +21,10 @@ pub fn start_turn_system(
 }
 
 // next turn player
-pub fn next_turn_system(
-    mut turn: ResMut<Turn>,
-    players: Query<Entity, With<Player>>,
+pub fn end_round_system(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<AppState>>,
 ) {
-    if keyboard.just_pressed(KeyCode::Space) {
-        let players_vec: Vec<Entity> = players.iter().collect();
-
-        if let Some(pos) = players_vec.iter().position(|&p| p == turn.current_player) {
-            let next_index = (pos + 1) % players_vec.len();
-            turn.current_player = players_vec[next_index];
-            turn.has_drawn_card = false;
-            info!(target: "mygame","Shift changed to player: {:?}", turn.current_player);
-        }
-    }
-    
     if keyboard.just_pressed(KeyCode::KeyR) {
             next_state.set(AppState::RoundEnd);
             info!(target: "mygame", "Round ended by player!");

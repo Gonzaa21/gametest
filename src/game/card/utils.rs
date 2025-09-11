@@ -7,7 +7,8 @@ pub fn discard_card(
     clicked_entity: Entity,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
     graveyard_query: &mut Query<&mut Graveyard>,
-    turn_query: &ResMut<Turn>,
+    turn_query: ResMut<Turn>,
+    player_query: &Query<(Entity, &Player)>,
 ) {
     if let Ok((_, _transform, card)) = card_query.get_mut(clicked_entity) {
         if matches!(card.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
@@ -23,6 +24,7 @@ pub fn discard_card(
 
                     info!(target: "mygame", "Card discarded directly to graveyard: {:?}", clicked_entity);
                 }
+                change_turn(turn_query, player_query);
             }
             return;
         }
@@ -33,9 +35,9 @@ pub fn card_swap(
     clicked_entity: Entity,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
     graveyard_query: &mut Query<&mut Graveyard>,
-    turn_query: &ResMut<Turn>,
+    turn_query: ResMut<Turn>,
     hand_query: &mut Query<&mut Hand>,
-    player_query: &Query<(Entity, &Player)>
+    player_query: &Query<(Entity, &Player)>,
 ) {
     let clicked_card = card_query.iter()
         .find(|(entity, _, _)| *entity == clicked_entity)
@@ -84,9 +86,28 @@ pub fn card_swap(
                         hand.cards.push(drawn_card_entity);
                     }
                 }
-
                 info!(target: "mygame", "Card swap completed: {:?} -> Hand, {:?} -> Graveyard", drawn_card_entity, clicked_entity);
+                change_turn(turn_query, &player_query);
             }
         }
+    }
+}
+
+// system to change turn automatically
+fn change_turn(
+    mut turn: ResMut<Turn>,
+    players: &Query<(Entity, &Player)>,
+) {
+    // obtain player list
+    let players: Vec<Entity> = players.iter()
+        .map(|(entity,_)| entity)
+        .collect();
+
+    if let Some(pos) = players.iter().position(|&p| p == turn.current_player) {
+        let next_index = (pos + 1) % players.len();
+        turn.current_player = players[next_index];
+        turn.has_drawn_card = false;
+
+        info!(target: "mygame", "Turn automatically changed to player: {:?}", turn.current_player);
     }
 }

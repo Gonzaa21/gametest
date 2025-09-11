@@ -1,5 +1,4 @@
 # por hacer sistemas
-- sistema de cartas especiales
 
 # por hacer UI
 - background del juego
@@ -16,7 +15,6 @@
 - hacerlo multijugador y solitario (IAs)
 
 # por hacer errores
-agregar lo de macros para codigo repetitivo
 
 # dependencia
 - uso de rustdoc para generar documentacion

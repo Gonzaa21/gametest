@@ -162,7 +162,7 @@ pub fn card_selection(
     if let Some(clicked_entity) = detect_card_click(&card_query, world_pos) {
         handle_card_click(
             clicked_entity, &mut commands, &selected_query, &mut double_click,
-            &time, &turn_query, &mut card_query, &mut graveyard_query, &player_query, &mut hand_query
+            &time, turn_query, &mut card_query, &mut graveyard_query, &player_query, &mut hand_query
         );
         return;
     }

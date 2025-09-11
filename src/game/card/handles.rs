@@ -10,7 +10,7 @@ pub fn handle_card_click(
     selected_query: &Query<Entity, With<Selected>>,
     double_click: &mut ResMut<DoubleClick>,
     time: &Res<Time>,
-    turn_query: &ResMut<Turn>,
+    turn_query: ResMut<Turn>,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
     graveyard_query: &mut Query<&mut Graveyard>,
     player_query: &Query<(Entity, &Player)>,
@@ -23,7 +23,7 @@ pub fn handle_card_click(
 
     if let Some(card_comp) = card_comp {
         if matches!(card_comp.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
-            discard_card(clicked_entity, card_query, graveyard_query, turn_query);
+            discard_card(clicked_entity, card_query, graveyard_query, turn_query, player_query);
             return;
         }
     }
