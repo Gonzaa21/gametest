@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
+
 use super::component::Hand;
 
 use crate::game::deck::component::Deck;
@@ -10,6 +12,7 @@ pub fn deal_initial_hands (
     player_query: Query<(Entity, &Player), With<Player>>,
     mut card_query: Query<(&mut Card, &mut Transform)>,
     mut hand_query: Query<&mut Hand>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
     // search deck
     let mut deck = match deck_query.single_mut() {
@@ -29,11 +32,14 @@ pub fn deal_initial_hands (
         // take 4 deck cards
         let hand_cards: Vec<Entity> = deck.cards_values.drain(0..4).collect();
 
+        // obtain window dimensions
+        let Ok(window) = windows.single() else { return; };
+
         // player positions
         let positions = match i {
-            0 => get_player_positions(0), // local player
-            1 => get_player_positions(1), // secondary player
-            _ => get_player_positions(0), // default
+            0 => get_player_positions(0, window.width(), window.height()),
+            1 => get_player_positions(1, window.width(), window.height()),
+            _ => get_player_positions(0, window.width(), window.height()),// default
         };
 
         // iterate deck cards and distribute it to players
@@ -54,12 +60,12 @@ pub fn deal_initial_hands (
 }
 
 // player positions auxiliar system
-fn get_player_positions(player_i: usize) -> [Vec3; 4] {
+fn get_player_positions(player_i: usize, window_width: f32, window_height: f32) -> [Vec3; 4] {
     match player_i {
         0 => {
-            let base_y = -320.0;
-            let base_x = -180.0;
-            let gap = 120.0;
+            let base_y = window_height * -0.35;  // 40% down
+            let base_x = window_width * -0.13;  // 13% left
+            let gap = window_width * 0.1;       // 10% win width
             [
                 Vec3::new(base_x, base_y, 10.0),
                 Vec3::new(base_x + gap, base_y, 11.0),
@@ -68,9 +74,9 @@ fn get_player_positions(player_i: usize) -> [Vec3; 4] {
             ]
         },
         1 => {
-            let base_y = 200.0;
-            let base_x = -180.0;
-            let gap = 120.0;
+            let base_y = window_height * 0.35;  // 25% win height
+            let base_x = window_width * -0.13;
+            let gap = window_width * 0.1;
             [
                 Vec3::new(base_x, base_y, 10.0),
                 Vec3::new(base_x + gap, base_y, 11.0),
@@ -78,6 +84,6 @@ fn get_player_positions(player_i: usize) -> [Vec3; 4] {
                 Vec3::new(base_x + gap * 3.0, base_y, 13.0),
             ]
         },
-        _ => get_player_positions(0)
+        _ => get_player_positions(0, window_width, window_height)
     }
 }

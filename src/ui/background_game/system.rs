@@ -39,7 +39,4 @@ pub fn adjust_background(
             }
         }
     }
-
-
-    
 }
