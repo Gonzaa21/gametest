@@ -21,3 +21,9 @@
 - uso de crate para ver el rendimiento
 
 _- Al terminar la mecanica básica del juego, agregar documentación -_
+
+aseprite
+-hacer botones (end + exit + play + settings) (solo falta end)
+-indicador de turno actual
+-ambientar las cartas
+-hacer cartel del nombre del juego
