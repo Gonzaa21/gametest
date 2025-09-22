@@ -11,7 +11,7 @@ pub fn spawn_graveyard(mut commands: Commands, windows: Query<&Window, With<Prim
 
     commands.spawn((
         Graveyard { cards: Vec::new() },
-        Transform::from_xyz(window.width() * -0.25, window.height() * 0.0, 5.0),
+        Transform::from_xyz(window.width() * -0.25, window.height() * 0.08, 5.0),
     ));
     info!(target: "mygame", "Graveyard spawned at center-left");
 }

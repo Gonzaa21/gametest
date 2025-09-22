@@ -172,7 +172,10 @@ pub fn card_selection(
 pub fn card_visual(
     mut card_query: Query<(&mut Transform, Option<&Selected>, &Card), With<Card>>,
     turn_query: Res<Turn>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
+    let Ok(window) = windows.single() else { return; };
+
     for (mut transform, selected, card) in card_query.iter_mut() {
         if let CardPosition::Hand(owner) = card.position {
             if owner == turn_query.current_player {
@@ -180,21 +183,23 @@ pub fn card_visual(
                 
                 if selected.is_some() {
                     if is_sec_player {
-                        transform.translation.y = 180.0; // if is second player
+                        transform.translation.y = window.height() * 0.1; // if is second player
                     } else {
-                        transform.translation.y = -300.0; // if is local player
+                        transform.translation.y = window.height() * -0.1; // if is local player
                     }
-                    transform.translation.z = 50.0; 
+                    transform.translation.z = 50.0;
                 } else {
                     // return default position
                     if is_sec_player {
                         if transform.translation.y < 190.0 {
-                            transform.translation.y = 200.0;
+                            let base_y = window.height() * 0.15;
+                            transform.translation.y = base_y;
                             transform.translation.z = 10.0;
                         }
                     } else {
                         if transform.translation.y > -310.0 {
-                            transform.translation.y = -320.0;
+                            let base_y = window.height() * -0.15;
+                            transform.translation.y = base_y;
                             transform.translation.z = 10.0;
                         }
                     }

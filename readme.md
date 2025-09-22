@@ -27,3 +27,8 @@ aseprite
 -indicador de turno actual
 -ambientar las cartas
 -hacer cartel del nombre del juego
+
+hands posicionados
+- modif detecciones de clicks
+- achicar las cartas
+- posicionar el deck y graveyard

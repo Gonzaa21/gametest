@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, WindowResized};
 use crate::ui::background_game::component::BackgroundImage;
+use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand};
+use crate::game::hand::system::get_player_positions;
 
 pub fn spawn_background(
     mut commands: Commands, 
@@ -36,6 +38,37 @@ pub fn adjust_background(
                 let final_scale = scale_x.min(scale_y);
 
                 transform.scale = Vec3::splat(final_scale);
+            }
+        }
+    }
+}
+
+pub fn update_all_positions(
+    mut resize_events: EventReader<WindowResized>,
+    window: Query<&Window, With<PrimaryWindow>>,
+    mut card_query: Query<(&mut Transform, &Card), (With<Card>, Without<BackgroundImage>)>,
+    player_query: Query<(Entity, &Player)>,
+    hand_query: Query<&Hand>,
+) {
+    for _resize_event in resize_events.read() {
+        // Update cards positions in hand
+        for (_player_entity, player) in player_query.iter() {
+            if let Ok(hand) = hand_query.get(player.hand) {
+                // determine player
+                let player_index = if player.is_local_player { 0 } else { 1 };
+
+                // obtain window and new positions
+                let Ok(window) = window.single() else { return; };
+                let positions = get_player_positions(player_index, window.width(), window.height());
+
+                // update each card
+                for (card_index, &card_entity) in hand.cards.iter().enumerate() {
+                    if let Ok((mut transform, card)) = card_query.get_mut(card_entity) {
+                        if matches!(card.position, CardPosition::Hand(_)) && card_index < 4 {
+                            transform.translation = positions[card_index];
+                        }
+                    }
+                }
             }
         }
     }

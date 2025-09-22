@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::game::{hand::system::deal_initial_hands, gamestate::AppState};
 use crate::game::deck::DeckSet;
 pub mod component;
-mod system;
+pub mod system;
 
 pub struct HandPlugin;
 

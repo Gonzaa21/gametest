@@ -60,12 +60,12 @@ pub fn deal_initial_hands (
 }
 
 // player positions auxiliar system
-fn get_player_positions(player_i: usize, window_width: f32, window_height: f32) -> [Vec3; 4] {
+pub fn get_player_positions(player_i: usize, window_width: f32, window_height: f32) -> [Vec3; 4] {
     match player_i {
         0 => {
-            let base_y = window_height * -0.35;  // 40% down
-            let base_x = window_width * -0.13;  // 13% left
-            let gap = window_width * 0.1;       // 10% win width
+            let base_y = window_height * -0.15;  // 15% down
+            let base_x = window_width * -0.08;  // 8% left
+            let gap = window_width * 0.07;       // 7% win width
             [
                 Vec3::new(base_x, base_y, 10.0),
                 Vec3::new(base_x + gap, base_y, 11.0),
@@ -74,9 +74,9 @@ fn get_player_positions(player_i: usize, window_width: f32, window_height: f32) 
             ]
         },
         1 => {
-            let base_y = window_height * 0.35;  // 25% win height
-            let base_x = window_width * -0.13;
-            let gap = window_width * 0.1;
+            let base_y = window_height * 0.15;  // 15% up
+            let base_x = window_width * -0.08;
+            let gap = window_width * 0.07;
             [
                 Vec3::new(base_x, base_y, 10.0),
                 Vec3::new(base_x + gap, base_y, 11.0),
