@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, WindowResized};
 use crate::ui::background_game::component::BackgroundImage;
-use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand};
+use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, graveyard::component::Graveyard};
 use crate::game::hand::system::get_player_positions;
 
 pub fn spawn_background(
@@ -49,6 +49,7 @@ pub fn update_all_positions(
     mut card_query: Query<(&mut Transform, &Card), (With<Card>, Without<BackgroundImage>)>,
     player_query: Query<(Entity, &Player)>,
     hand_query: Query<&Hand>,
+    mut graveyard_query: Query<&mut Transform, (With<Graveyard>, Without<Card>, Without<BackgroundImage>)>,
 ) {
     for _resize_event in resize_events.read() {
         // Update cards positions in hand
@@ -67,6 +68,20 @@ pub fn update_all_positions(
                         if matches!(card.position, CardPosition::Hand(_)) && card_index < 4 {
                             transform.translation = positions[card_index];
                         }
+                    }
+                }
+
+                // update graveyard pos
+                if let Ok(mut graveyard_transform) = graveyard_query.single_mut() {
+                    graveyard_transform.translation.x = window.width() * 0.0;
+                    graveyard_transform.translation.y = window.height() * -0.05;
+                }
+
+                // update drawn cards pos
+                for (mut transform, card) in card_query.iter_mut() {
+                    if matches!(card.position, CardPosition::DrawnCard(_)) {
+                        transform.translation.x = window.width() * 0.1;
+                        transform.translation.y = window.height() * 0.0;
                     }
                 }
             }

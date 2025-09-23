@@ -28,7 +28,6 @@ aseprite
 -ambientar las cartas
 -hacer cartel del nombre del juego
 
-hands posicionados
-- modif detecciones de clicks
-- achicar las cartas
-- posicionar el deck y graveyard
+- terminar de arreglar lo de selection
+- poner lo de la resolucion predeterminada
+- hacer menu

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
-use crate::game::card::component::{Card, CardPosition, };
+use bevy::window::PrimaryWindow;
+use crate::game::card::component::{Card, CardPosition, Selected};
 use crate::game::{graveyard::component::Graveyard, turn_player::component::Turn, hand::component::Hand, player::component::Player};
 
 // AUXILIAR SYSTEMS
@@ -9,6 +10,9 @@ pub fn discard_card(
     graveyard_query: &mut Query<&mut Graveyard>,
     turn_query: ResMut<Turn>,
     player_query: &Query<(Entity, &Player)>,
+    windows: Query<&Window, With<PrimaryWindow>>,
+    commands: &mut Commands,
+    selected_query: &Query<Entity, With<Selected>>,
 ) {
     if let Ok((_, _transform, card)) = card_query.get_mut(clicked_entity) {
         if matches!(card.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
@@ -16,14 +20,21 @@ pub fn discard_card(
                 card.position = CardPosition::Graveyard;
                 card.face_up = true;
 
+                let Ok(window) = windows.single() else { return; };
                 // update graveyard
                 if let Ok(mut graveyard) = graveyard_query.single_mut() {
                     graveyard.cards.push(clicked_entity);
 
-                    card_transform.translation = Vec3::new(-150.0, 50.0, graveyard.cards.len() as f32);
+                    card_transform.translation = Vec3::new(window.width() * -0.06, window.height() * 0.0, graveyard.cards.len() as f32);
 
                     info!(target: "mygame", "Card discarded directly to graveyard: {:?}", clicked_entity);
                 }
+
+                // remove card selection
+                for selected_entity in selected_query.iter() {
+                    commands.entity(selected_entity).remove::<Selected>();
+                }
+
                 change_turn(turn_query, player_query);
             }
             return;
@@ -38,6 +49,9 @@ pub fn card_swap(
     turn_query: ResMut<Turn>,
     hand_query: &mut Query<&mut Hand>,
     player_query: &Query<(Entity, &Player)>,
+    windows: Query<&Window, With<PrimaryWindow>>,
+    commands: &mut Commands,
+    selected_query: &Query<Entity, With<Selected>>,
 ) {
     let clicked_card = card_query.iter()
         .find(|(entity, _, _)| *entity == clicked_entity)
@@ -74,9 +88,10 @@ pub fn card_swap(
             clicked_card.position = CardPosition::Graveyard; // card of hand selected to graveyard
             clicked_card.face_up = true; // card front
             
+            let Ok(window) = windows.single() else { return; };
             if let Ok(mut graveyard) = graveyard_query.single_mut() {
                 graveyard.cards.push(clicked_entity); // update changes
-                clicked_transform.translation = Vec3::new(-150.0, 50.0, graveyard.cards.len() as f32); // position in graveyard
+                clicked_transform.translation = Vec3::new(window.width() * -0.06, window.height() * 0.0, graveyard.cards.len() as f32); // position in graveyard
                 
                 if let Some((_, player)) = player_query.iter().find(|(entity, _)| *entity == turn_query.current_player) {
                     if let Ok(mut hand) = hand_query.get_mut(player.hand) {
@@ -87,6 +102,13 @@ pub fn card_swap(
                     }
                 }
                 info!(target: "mygame", "Card swap completed: {:?} -> Hand, {:?} -> Graveyard", drawn_card_entity, clicked_entity);
+                
+                // remove card selection
+                for selected_entity in selected_query.iter() {
+                    commands.entity(selected_entity).remove::<Selected>();
+                }
+
+                // automatic turn
                 change_turn(turn_query, &player_query);
             }
         }

@@ -40,7 +40,7 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_
 
         let card_entity = commands.spawn((
             Sprite::from_image(card_back.0.clone()),
-            Transform::from_xyz(window.width() * 0.25, window.height() * 0.08, idx as f32).with_scale(Vec3::splat(0.8)),
+            Transform::from_xyz(window.width() * 0.15, window.height() * 0.0, idx as f32).with_scale(Vec3::splat(0.7)),
             Card {
                 suit,
                 value,

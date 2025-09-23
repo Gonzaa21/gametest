@@ -148,13 +148,13 @@ pub fn card_selection(
 
     // detect click in deck
     if detect_deck_click(world_pos, window) {
-        handle_deck_click(deck_query, turn_query, &mut card_query);
+        handle_deck_click(deck_query, turn_query, &mut card_query, windows);
         return;
     }
 
     // detect click in graveyard 
     if detect_graveyard_click(world_pos, window) {
-        handle_graveyard_click(graveyard_query, turn_query, &mut card_query);
+        handle_graveyard_click(graveyard_query, turn_query, &mut card_query, windows);
         return;
     }
 
@@ -162,9 +162,17 @@ pub fn card_selection(
     if let Some(clicked_entity) = detect_card_click(&card_query, world_pos) {
         handle_card_click(
             clicked_entity, &mut commands, &selected_query, &mut double_click,
-            &time, turn_query, &mut card_query, &mut graveyard_query, &player_query, &mut hand_query
+            &time, turn_query, &mut card_query, &mut graveyard_query, &player_query, &mut hand_query, windows
         );
         return;
+    }
+
+    // if is not detected any entity
+    if detect_card_click(&card_query, world_pos).is_none() && !detect_deck_click(world_pos, window) && !detect_graveyard_click(world_pos, window) {
+        // deselect all cards
+        for selected_entity in selected_query.iter() {
+            commands.entity(selected_entity).remove::<Selected>();
+        }
     }
 }
 
@@ -183,9 +191,9 @@ pub fn card_visual(
                 
                 if selected.is_some() {
                     if is_sec_player {
-                        transform.translation.y = window.height() * 0.1; // if is second player
+                        transform.translation.y = window.height() * 0.13; // if is second player
                     } else {
-                        transform.translation.y = window.height() * -0.1; // if is local player
+                        transform.translation.y = window.height() * -0.13; // if is local player
                     }
                     transform.translation.z = 50.0;
                 } else {
@@ -237,7 +245,7 @@ fn detect_card_click(
 ) -> Option<Entity> {
     for (card_entity, card_transform, _card_comp) in card_query.iter() {
         let card_pos = card_transform.translation;
-        let card_size = Vec2::new(80.0, 120.0 * 0.8);
+        let card_size = Vec2::new(80.0 * 0.7, 120.0 * 0.7);
         
         // Check if the click is inside the card
         if world_pos.x >= card_pos.x - card_size.x / 2.0 
@@ -251,8 +259,8 @@ fn detect_card_click(
 }
 
 fn detect_deck_click(world_pos: Vec2, window: &Window) -> bool {
-    let deck_x = window.width() * 0.25;
-    let deck_y = window.height() * 0.08;
+    let deck_x = window.width() * 0.15;
+    let deck_y = window.height() * 0.0;
     let deck_pos = Vec3::new(deck_x, deck_y, 0.0);
     let deck_size = Vec2::new(80.0, 120.0);
     
@@ -263,8 +271,8 @@ fn detect_deck_click(world_pos: Vec2, window: &Window) -> bool {
 }
 
 fn detect_graveyard_click(world_pos: Vec2, window: &Window) -> bool {
-    let graveyard_x = window.width() * 0.25;
-    let graveyard_y = window.height() * 0.08;
+    let graveyard_x = window.width() * -0.06;
+    let graveyard_y = window.height() * 0.0;
     let graveyard_pos = Vec3::new(graveyard_x, graveyard_y, 0.0);
     let graveyard_size = Vec2::new(80.0, 120.0);
     

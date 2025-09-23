@@ -50,6 +50,7 @@ pub fn deal_initial_hands (
                 card.face_up  = i == 0 && j < 2;
             
                 tf.translation = positions[j];
+                tf.scale = Vec3::splat(0.7);
             }
         }
 
@@ -64,8 +65,8 @@ pub fn get_player_positions(player_i: usize, window_width: f32, window_height: f
     match player_i {
         0 => {
             let base_y = window_height * -0.15;  // 15% down
-            let base_x = window_width * -0.08;  // 8% left
-            let gap = window_width * 0.07;       // 7% win width
+            let base_x = window_width * -0.06;  // 8% left
+            let gap = window_width * 0.06;       // 7% win width
             [
                 Vec3::new(base_x, base_y, 10.0),
                 Vec3::new(base_x + gap, base_y, 11.0),
@@ -75,8 +76,8 @@ pub fn get_player_positions(player_i: usize, window_width: f32, window_height: f
         },
         1 => {
             let base_y = window_height * 0.15;  // 15% up
-            let base_x = window_width * -0.08;
-            let gap = window_width * 0.07;
+            let base_x = window_width * -0.06;
+            let gap = window_width * 0.06;
             [
                 Vec3::new(base_x, base_y, 10.0),
                 Vec3::new(base_x + gap, base_y, 11.0),

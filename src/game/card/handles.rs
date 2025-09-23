@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 use crate::game::card::component::{Card, CardPosition, Selected, DoubleClick};
 use crate::game::{graveyard::component::Graveyard, turn_player::component::Turn, deck::component::Deck, hand::component::Hand, player::component::Player};
 use crate::game::card::utils::{card_swap, discard_card};
@@ -15,6 +16,7 @@ pub fn handle_card_click(
     graveyard_query: &mut Query<&mut Graveyard>,
     player_query: &Query<(Entity, &Player)>,
     hand_query: &mut Query<&mut Hand>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
     // verify: if it is direct discard
     let card_comp = card_query.iter()
@@ -23,7 +25,7 @@ pub fn handle_card_click(
 
     if let Some(card_comp) = card_comp {
         if matches!(card_comp.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
-            discard_card(clicked_entity, card_query, graveyard_query, turn_query, player_query);
+            discard_card(clicked_entity, card_query, graveyard_query, turn_query, player_query, windows, commands, selected_query);
             return;
         }
     }
@@ -42,14 +44,16 @@ pub fn handle_card_click(
     }
 
     if is_double_click {
-        card_swap(clicked_entity, card_query, graveyard_query, turn_query, hand_query, player_query);
+        card_swap(clicked_entity, card_query, graveyard_query, turn_query, hand_query, player_query, windows, commands, selected_query);
+        double_click.last_card = None; // reset double click
+        return;
     } else {
         // selection component
         for selected_entity in selected_query.iter() {
             commands.entity(selected_entity).remove::<Selected>();
         }
         commands.entity(clicked_entity).insert(Selected);
-        
+
         double_click.last_card = Some(clicked_entity);
         double_click.last_click_time = current_time;
         info!(target: "mygame", "Card selected: {:?}", clicked_entity);
@@ -60,6 +64,7 @@ pub fn handle_deck_click(
     mut deck_query: Query<&mut Deck>,
     mut turn_query: ResMut<Turn>,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
     // verify if player already drew a card
     if turn_query.has_drawn_card {
@@ -83,14 +88,15 @@ pub fn handle_deck_click(
     }
 
     let drawn_card_entity = deck.cards_values.remove(0); // take first card of the deck
-    
+    let Ok(window) = windows.single() else { return; };
+
     if let Ok((_, mut transform, mut card)) = card_query.get_mut(drawn_card_entity) {
         card.position = CardPosition::DrawnCard(turn_query.current_player);
         card.owner_id = Some(turn_query.current_player);
         card.face_up = true; // show card taken
         card.from_deck = true; // card taken from deck
         
-        transform.translation = Vec3::new(0.0, -100.0, 30.0); // card taken position
+        transform.translation = Vec3::new(window.width() * 0.1, 0.0, 30.0); // card taken position
         turn_query.has_drawn_card = true; // player already drew a card
         info!(target: "mygame", "Player {:?} drew card: {:?}", turn_query.current_player, drawn_card_entity);
     }
@@ -100,6 +106,7 @@ pub fn handle_graveyard_click(
     mut graveyard_query: Query<&mut Graveyard>,
     mut turn_query: ResMut<Turn>,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
     // verify if player already drew a card
     if turn_query.has_drawn_card {
@@ -131,13 +138,15 @@ pub fn handle_graveyard_click(
         }
     };
 
+    let Ok(window) = windows.single() else { return; };
+
     if let Ok((_, mut transform, mut card)) = card_query.get_mut(drawn_card_entity) {
         card.position = CardPosition::DrawnCard(turn_query.current_player);
         card.owner_id = Some(turn_query.current_player);
         card.face_up = true; // show card taken
         card.from_deck = false; // card not taken from deck
 
-        transform.translation = Vec3::new(0.0, -100.0, 30.0); // card taken position
+        transform.translation = Vec3::new(window.width() * 0.1, 0.0, 30.0); // card taken position
         turn_query.has_drawn_card = true; // player already drew a card
         info!(target: "mygame", "Player {:?} drew card: {:?}", turn_query.current_player, drawn_card_entity);
     }
