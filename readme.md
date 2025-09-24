@@ -1,7 +1,6 @@
 # por hacer sistemas
 
 # por hacer UI
-- background del juego
 - botones (end round/exit game)
 - scoreboard
 
@@ -15,6 +14,7 @@
 - hacerlo multijugador y solitario (IAs)
 
 # por hacer errores
+- terminar de arreglar lo de selection
 
 # dependencia
 - uso de rustdoc para generar documentacion
@@ -27,7 +27,3 @@ aseprite
 -indicador de turno actual
 -ambientar las cartas
 -hacer cartel del nombre del juego
-
-- terminar de arreglar lo de selection
-- poner lo de la resolucion predeterminada
-- hacer menu

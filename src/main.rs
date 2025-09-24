@@ -8,10 +8,26 @@ use game::GamePlugin;
 use ui::UiPlugin;
 use global::setup_camera;
 
+// fn main() {
+//     App::new()
+//     .add_plugins(DefaultPlugins)
+//     .add_systems(Startup,setup_camera)
+//     .add_plugins(GamePlugin)
+//     .add_plugins(UiPlugin)
+//     .run();
+// }
 fn main() {
     App::new()
-    .add_plugins(DefaultPlugins)
-    .add_systems(Startup,setup_camera)
+    .add_plugins(DefaultPlugins.set(WindowPlugin {
+        primary_window: Some(Window {
+            resolution: (1280.0, 720.0).into(),
+            title: "Game test".to_string(),
+            resizable: false,
+            ..default()
+        }),
+        ..default()
+    }))
+    .add_systems(Startup, setup_camera)
     .add_plugins(GamePlugin)
     .add_plugins(UiPlugin)
     .run();
