@@ -1,7 +1,4 @@
-# por hacer sistemas
-
 # por hacer UI
-- botones (end round/exit game)
 - scoreboard
 
 # por hacer Sprites
@@ -14,7 +11,9 @@
 - hacerlo multijugador y solitario (IAs)
 
 # por hacer errores
-- terminar de arreglar lo de selection
+- arreglar lo de selection
+- hacer y terminar main menu IU
+- migrar a 0.17
 
 # dependencia
 - uso de rustdoc para generar documentacion
@@ -23,7 +22,7 @@
 _- Al terminar la mecanica básica del juego, agregar documentación -_
 
 aseprite
--hacer botones (end + exit + play + settings) (solo falta end)
+-hacer botones (solo falta end)
 -indicador de turno actual
 -ambientar las cartas
 -hacer cartel del nombre del juego
