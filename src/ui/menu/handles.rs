@@ -13,7 +13,7 @@ pub fn handle_button_clicks(
     images: Res<Assets<Image>>,
     sprites: Query<&Sprite>,
     mut next_state: ResMut<NextState<AppState>>,
-    mut exit_query: EventWriter<AppExit>,
+    mut exit_query: MessageWriter<AppExit>,
 ) {
     // only if click left mouse button
     if mouse_input.just_pressed(MouseButton::Left) {

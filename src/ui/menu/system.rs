@@ -23,7 +23,7 @@ pub fn adjust_background(
     mut bg_query: Query<(&mut Transform, &MenuBackground)>,
     window: Query<&Window, With<PrimaryWindow>>,
     images: Res<Assets<Image>>,
-    mut resize_events: EventReader<WindowResized>,
+    mut resize_events: MessageReader<WindowResized>,
 ) {
     // adjust background resize if have event
     for _resize_event in resize_events.read() {
