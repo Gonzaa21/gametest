@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::ui::menu::component::{MainMenuUI, MenuBackground, PlayButton, ExitButton};
+use crate::{ui::menu::component::{ButtonImages, ButtonState, ExitButton, MainMenuUI, MenuBackground, PlayButton}};
 use bevy::window::{PrimaryWindow, WindowResized};
 
 // spawn_background
@@ -49,20 +49,30 @@ pub fn spawn_buttons(
     mut commands: Commands, 
     asset_server: Res<AssetServer>
 ) {
-    let image_play: Handle<Image> = asset_server.load("textures/ui/buttons/PLAY_normal.png");
-    let image_exit: Handle<Image> = asset_server.load("textures/ui/buttons/EXIT_normal.png");
+    let image_play_normal: Handle<Image> = asset_server.load("textures/ui/buttons/play_oaa1.png");
+    let image_exit_normal: Handle<Image> = asset_server.load("textures/ui/buttons/exit_oaa1.png");
     
+    let image_play_pressed: Handle<Image> = asset_server.load("textures/ui/buttons/play_oaa2.png");
+    let image_exit_pressed: Handle<Image> = asset_server.load("textures/ui/buttons/exit_oaa2.png");
+
+    let image_play_hover: Handle<Image> = asset_server.load("textures/ui/buttons/play_oaa3.png");
+    let image_exit_hover: Handle<Image> = asset_server.load("textures/ui/buttons/exit_oaa3.png");
+
     // Spawn with default scale
     commands.spawn((
-        Sprite::from_image(image_play.clone()),
-        Transform::from_xyz(100.0, 0.0, 0.0),
+        Sprite::from_image(image_play_normal.clone()),
+        Transform::from_xyz(100.0, 0.0, 0.0).with_scale(Vec3::splat(0.7)),
+        ButtonImages {normal: image_play_normal, pressed: image_play_pressed, hovered: image_play_hover},
+        ButtonState::Normal,
         PlayButton,
         MainMenuUI,
     ));
 
     commands.spawn((
-        Sprite::from_image(image_exit.clone()),
-        Transform::from_xyz(-100.0, 0.0, 0.0),
+        Sprite::from_image(image_exit_normal.clone()),
+        Transform::from_xyz(-100.0, 0.0, 0.0).with_scale(Vec3::splat(0.7)),
+        ButtonImages {normal: image_exit_normal, pressed: image_exit_pressed, hovered: image_exit_hover},
+        ButtonState::Normal,
         ExitButton,
         MainMenuUI,
     ));

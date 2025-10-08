@@ -26,3 +26,14 @@ aseprite
 -indicador de turno actual
 -ambientar las cartas
 -hacer cartel del nombre del juego
+
+! MIGRAR DE VERSION !
+! HACER CARTEL DEL MENU ! (y asi terminar el menu)
+
+! BOTON DE SALIR EN DENTRO DE SETUP ! (diseñar + implementar)
+! INDICADOR DEL TURNO ! (diseñar + implementar)
+! AMBIENTAR CARTAS ! (diseñar)
+
+! CORREGIR ERRORES !
+
+VER CON QUE SEGUIR
