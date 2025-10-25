@@ -7,7 +7,10 @@ pub fn spawn_button(
     mut commands: Commands, 
     asset_server: Res<AssetServer>,
     existing_buttons: Query<Entity, With<BackButton>>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
+    let Ok(window) = windows.single() else { return; };
+
     // spawn if not exists now
     if !existing_buttons.is_empty() {
         return;
@@ -20,7 +23,7 @@ pub fn spawn_button(
     // Spawn with default scale
     commands.spawn((
         Sprite::from_image(image_back_normal.clone()),
-        Transform::from_xyz(-550.0, 320.0, 10.0).with_scale(Vec3::splat(0.7)),
+        Transform::from_xyz(window.width() * -0.44, window.height() * 0.4, 10.0).with_scale(Vec3::splat(0.7)),
         ButtonImages {normal: image_back_normal, pressed: image_back_pressed, hovered: image_back_hover},
         ButtonState::Normal,
         BackButton,

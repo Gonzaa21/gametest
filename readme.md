@@ -22,7 +22,6 @@ _- Al terminar la mecanica básica del juego, agregar documentación -_
 
 ! HACER CARTEL DEL MENU ! (y asi terminar el menu)
 
-! BOTON DE SALIR EN DENTRO DE SETUP ! (implementar)
 ! INDICADOR DEL TURNO ! (implementar)
 ! AMBIENTAR CARTAS ! (diseñar)
 
