@@ -19,25 +19,55 @@ pub fn spawn_background(
     ));
 }
 
+// adjust background scale
+fn adjust_scale(
+    bg_query: &mut Query<(&mut Transform, &MenuBackground)>,
+    window: &Window,
+    images: &Res<Assets<Image>>,
+) {
+    for (mut transform, bg_image) in bg_query.iter_mut() {
+        if let Some(img) = images.get(&bg_image.0) {
+            let image_width = img.size().x as f32;
+            let image_height = img.size().y as f32;
+            let scale_x = window.width() / image_width;
+            let scale_y = window.height() / image_height;
+            let final_scale = scale_x.max(scale_y);
+            transform.scale = Vec3::splat(final_scale);
+        }
+    }
+}
+
+// adjust bg if have a resize event in window
 pub fn adjust_background(
     mut bg_query: Query<(&mut Transform, &MenuBackground)>,
     window: Query<&Window, With<PrimaryWindow>>,
     images: Res<Assets<Image>>,
     mut resize_events: MessageReader<WindowResized>,
 ) {
-    // adjust background resize if have event
     for _resize_event in resize_events.read() {
-        // adjust background scale
-        for (mut transform, bg_image) in bg_query.iter_mut() {
-            if let Some(img) = images.get(&bg_image.0) {
-                let Ok(window) = window.single() else { continue; };
+        let Ok(window) = window.single() else { continue; };
+        adjust_scale(&mut bg_query, window, &images);
+    }
+}
 
+// adjust bg initially
+pub fn initial_adjust_background(
+    mut bg_query: Query<(&mut Transform, &MenuBackground)>,
+    window: Query<&Window, With<PrimaryWindow>>,
+    images: Res<Assets<Image>>,
+) {
+    let Ok(window) = window.single() else { return; };
+    
+    for (mut transform, bg_image) in bg_query.iter_mut() {
+        // adjust if the background img was uploaded but the transform is not adjusted
+        if let Some(img) = images.get(&bg_image.0) {
+            // verify if it has already been adjusted
+            if transform.scale == Vec3::splat(1.0) {
                 let image_width = img.size().x as f32;
                 let image_height = img.size().y as f32;
                 let scale_x = window.width() / image_width;
                 let scale_y = window.height() / image_height;
                 let final_scale = scale_x.max(scale_y);
-
                 transform.scale = Vec3::splat(final_scale);
             }
         }

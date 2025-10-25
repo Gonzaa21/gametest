@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use crate::game::gamestate::AppState;
+use round_end::system::cleanup_game_entities;
 
 pub mod gamestate;
 pub mod player;
@@ -33,6 +35,9 @@ impl Plugin for GamePlugin {
         .add_plugins(CardPlugin)
         .add_plugins(TurnPlugin)
         .add_plugins(RoundEndPlugin)
-        .add_plugins(SpecialCardsPlugin);
+        .add_plugins(SpecialCardsPlugin)
+
+        // clean all entities on exit
+        .add_systems(OnEnter(AppState::MainMenu), cleanup_game_entities);
     }
 }

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::game::gamestate::AppState;
 
-mod system;
+pub mod system;
 use system::{reveal_all_cards, calculate_scores, prepare_new_round};
 
 pub struct RoundEndPlugin;

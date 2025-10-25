@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
+use crate::game::gamestate::GameEntity;
 use crate::game::graveyard::component::Graveyard;
 
 pub fn spawn_graveyard(mut commands: Commands, windows: Query<&Window, With<PrimaryWindow>>,) {
@@ -12,6 +13,7 @@ pub fn spawn_graveyard(mut commands: Commands, windows: Query<&Window, With<Prim
     commands.spawn((
         Graveyard { cards: Vec::new() },
         Transform::from_xyz(window.width() * -0.06, window.height() * 0.0, 5.0),
+        GameEntity,
     ));
     info!(target: "mygame", "Graveyard spawned");
 }

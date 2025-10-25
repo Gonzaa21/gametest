@@ -1,19 +1,54 @@
 use bevy::prelude::*;
-
-use bevy::window::PrimaryWindow;
-use crate::ui::menu::component::{ButtonState, ButtonImages, ExitButton, PlayButton, MainMenuUI};
+use crate::ui::back_button::component::{ButtonState, BackButton, SetupUI, ButtonImages};
 use crate::game::gamestate::AppState;
+use bevy::window::PrimaryWindow;
 
-// detect click in PLAY and change to Setup, detect click in EXIT and close game
-pub fn handle_button_clicks(
-    mouse_input: Res<ButtonInput<MouseButton>>,
+pub fn spawn_button(
+    mut commands: Commands, 
+    asset_server: Res<AssetServer>,
+    existing_buttons: Query<Entity, With<BackButton>>,
+) {
+    // spawn if not exists now
+    if !existing_buttons.is_empty() {
+        return;
+    }
+
+    let image_back_normal: Handle<Image> = asset_server.load("textures/ui/buttons/back1.png");
+    let image_back_pressed: Handle<Image> = asset_server.load("textures/ui/buttons/back2.png");
+    let image_back_hover: Handle<Image> = asset_server.load("textures/ui/buttons/back3.png");
+
+    // Spawn with default scale
+    commands.spawn((
+        Sprite::from_image(image_back_normal.clone()),
+        Transform::from_xyz(-550.0, 320.0, 10.0).with_scale(Vec3::splat(0.7)),
+        ButtonImages {normal: image_back_normal, pressed: image_back_pressed, hovered: image_back_hover},
+        ButtonState::Normal,
+        BackButton,
+        SetupUI,
+    ));
+}
+
+// clean_menu
+pub fn clean_button(
+    mut commands: Commands,
+    menu_query: Query<Entity, With<SetupUI>>,
+) {
+    for entity in menu_query.iter() {
+        commands.entity(entity).despawn();
+    }
+}
+
+
+
+// Handle and detect button
+pub fn handle_button(
     windows: Query<&Window, With<PrimaryWindow>>,
+    mouse_input: Res<ButtonInput<MouseButton>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    mut button_query: Query<(&Transform, &mut ButtonState, Option<&PlayButton>, Option<&ExitButton>, Entity)>,
     images: Res<Assets<Image>>,
     sprites: Query<&Sprite>,
+    mut button_query: Query<(&Transform, &mut ButtonState, Option<&BackButton>, Entity)>,
     mut next_state: ResMut<NextState<AppState>>,
-    mut exit_query: MessageWriter<AppExit>,
 ) {
     // only if click left mouse button
     if mouse_input.just_pressed(MouseButton::Left) {
@@ -24,7 +59,7 @@ pub fn handle_button_clicks(
         let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else { return; };
 
         // verify colision
-        for (transform, mut state, _play, _exit, entity) in &mut button_query {
+        for (transform, mut state, _back, entity) in &mut button_query {
             let Ok(sprite) = sprites.get(entity) else { continue; };
             let handle: &Handle<Image> = &sprite.image; // obtain img sprite
             if let Some(image) = images.get(handle) {
@@ -47,18 +82,16 @@ pub fn handle_button_clicks(
         let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else { return; };
         
         // For each button in Pressed state:
-        for (transform, mut state, play, exit, entity) in &mut button_query {
+        for (transform, mut state, back, entity) in &mut button_query {
             let Ok(sprite) = sprites.get(entity) else { continue; };
             let handle: &Handle<Image> = &sprite.image; // obtain img sprite
             if let Some(image) = images.get(handle) {
                 // if the cursor remains over the button: execute action
                 if detect_button(world_pos, transform, image) {
-                    if play.is_some() {
-                        next_state.set(AppState::Setup);
-                        info!(target: "mygame", "Starting game...");
-                    } else if exit.is_some() {
-                        exit_query.write(AppExit::Success);
-                    }
+                    if back.is_some() {
+                        next_state.set(AppState::MainMenu);
+                        info!(target: "mygame", "Return to menu...");
+                    } 
                     *state = ButtonState::Normal;
                 } else {
                     // else, change to normal/hovered state
@@ -86,8 +119,8 @@ fn detect_button(
     cursor_pos.y <= button_pos.y + half_size.y
 }
 
-pub fn update_button_visuals(
-    mut button_query: Query<(&ButtonState, &ButtonImages, &mut Sprite), With<MainMenuUI>>,
+pub fn button_visuals(
+    mut button_query: Query<(&ButtonState, &ButtonImages, &mut Sprite), With<BackButton>>,
 ) {
     // verify state of all buttons and update sprite
     for (state, images, mut sprite) in &mut button_query {
@@ -100,7 +133,7 @@ pub fn update_button_visuals(
 }
 
 // detect if mouse is on the button
-pub fn update_button_hover(
+pub fn button_hover(
     windows: Query<&Window, With<PrimaryWindow>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mut button_query: Query<(&Transform, &mut ButtonState, Entity)>,

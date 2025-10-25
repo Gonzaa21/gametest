@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, gamestate::AppState, turn_player::component::Turn, graveyard::component::Graveyard, deck::component::Deck};
+use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, gamestate::{AppState, GameEntity}, turn_player::component::Turn, graveyard::component::Graveyard, deck::component::Deck};
 
 // Reveal all cards
 pub fn reveal_all_cards(
@@ -86,4 +86,15 @@ pub fn prepare_new_round(
         next_state.set(AppState::Setup);
         info!(target: "mygame", "Starting new round...");
     }
+}
+
+// clean all game entities (registered in game/mod.rs)
+pub fn cleanup_game_entities(
+    mut commands: Commands,
+    game_entities: Query<Entity, With<GameEntity>>,
+) {
+    for entity in game_entities.iter() {
+        commands.entity(entity).despawn();
+    }
+    info!(target: "mygame", "Game cleaned up");
 }

@@ -3,6 +3,7 @@ use bevy::window::{PrimaryWindow, WindowResized};
 use crate::ui::background_game::component::BackgroundImage;
 use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, graveyard::component::Graveyard};
 use crate::game::hand::system::get_player_positions;
+use crate::game::gamestate::GameEntity;
 
 pub fn spawn_background(
     mut commands: Commands, 
@@ -15,6 +16,7 @@ pub fn spawn_background(
         Sprite::from_image(image_handle.clone()),
         Transform::from_xyz(0.0, 0.0, -10.0),
         BackgroundImage(image_handle),
+        GameEntity,
     ));
 }
 

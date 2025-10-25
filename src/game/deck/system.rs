@@ -3,7 +3,7 @@ use rand::seq::SliceRandom;
 use bevy::window::PrimaryWindow;
 
 use super::component::Deck;
-use crate::game::card::{component::{Card, CardPosition, Suit, CardHandles, CardBack}};
+use crate::game::{card::component::{Card, CardBack, CardHandles, CardPosition, Suit}, gamestate::GameEntity};
 
 pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_back: Res<CardBack>, windows: Query<&Window, With<PrimaryWindow>>,) {
     let suits = [Suit::Coarse, Suit::Cup, Suit::Gold, Suit::Sword];
@@ -49,13 +49,18 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_
                 position: CardPosition::Deck,
                 front_face: handle.clone(),
                 from_deck: false
-        })).id();
+            },
+            GameEntity,
+        )).id();
 
         card_entities.push(card_entity);
     }
 
     // spawn deck entity
-    commands.spawn(Deck {
-        cards_values: card_entities,
-    });
+    commands.spawn((
+        Deck {
+            cards_values: card_entities
+        },
+        GameEntity,
+    ));
 }
