@@ -82,9 +82,17 @@ pub fn card_swap(
             
             let clicked_pos = clicked_transform.translation; // obtain position
             
+            let Ok(window) = windows.single() else { return; };
+            let is_sec_player = clicked_pos.y > 0.0;
+            let base_y = if is_sec_player {
+                window.height() * 0.15
+            } else {
+                window.height() * -0.15
+            };
+
             drawn_card.position = CardPosition::Hand(turn_query.current_player);
             drawn_card.face_up = false;
-            drawn_transform.translation = clicked_pos;
+            drawn_transform.translation = Vec3::new(clicked_pos.x, base_y, 10.0);
             clicked_card.position = CardPosition::Graveyard; // card of hand selected to graveyard
             clicked_card.face_up = true; // card front
             

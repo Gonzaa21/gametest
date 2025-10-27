@@ -44,6 +44,11 @@ pub fn handle_card_click(
     }
 
     if is_double_click {
+        // remove SELECTED to all cards after swap
+        for selected_entity in selected_query.iter() {
+            commands.entity(selected_entity).remove::<Selected>();
+        }
+
         card_swap(clicked_entity, card_query, graveyard_query, turn_query, hand_query, player_query, windows, commands, selected_query);
         double_click.last_card = None; // reset double click
         return;

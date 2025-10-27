@@ -198,20 +198,20 @@ pub fn card_visual(
                     transform.translation.z = 50.0;
                 } else {
                     // return default position
-                    if is_sec_player {
-                        if transform.translation.y < 190.0 {
-                            let base_y = window.height() * 0.15;
-                            transform.translation.y = base_y;
-                            transform.translation.z = 10.0;
-                        }
+                    let base_y = if is_sec_player {
+                        window.height() * 0.15
                     } else {
-                        if transform.translation.y > -310.0 {
-                            let base_y = window.height() * -0.15;
-                            transform.translation.y = base_y;
-                            transform.translation.z = 10.0;
-                        }
-                    }
+                        window.height() * -0.15
+                    };
+                    transform.translation.y = base_y;
+                    transform.translation.z = 10.0;
                 }
+            } else {
+                transform.translation.z = 10.0;
+            }
+        } else {
+            if transform.translation.z >= 50.0 {
+                transform.translation.z = 10.0;
             }
         }
     }

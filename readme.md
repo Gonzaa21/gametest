@@ -1,30 +1,18 @@
-# por hacer UI
-- scoreboard
+# PRIORIDAD ALTA
+1. correguir errores: sistema de selection, cartas duplicadas y no volteadas al inicio
+2. terminar menu principal (cartel del juego) -- *agregar boton de configur. en el futuro
+3. implementar scoreboard
 
-# por hacer Sprites
-- en Mazo y Pozo al apilar varias cartas que se muevan un poco a la derecha (efecto al apilar cartas)
-- animaciones de cartas (volteo, repartir cartas al principio)
-- audio (de fondo + cartas)
+# PRIORIDAD MEDIA
+4. Animaciones de cartas (volteo, repartir, mover)
+5. Efecto de apilado en mazo y pozo
+6. Audio (de fondo + efecto de cartas)
+7. Indicador de turno (UI)
+8. Ambientar las cartas (diseñar)
 
-# por hacer partes del programa
-- hacer todo el menu de juego
-- hacerlo multijugador y solitario (IAs)
-
-# por hacer errores
-- arreglar lo de selection
-- hacer y terminar main menu IU
-
-# dependencia
-- uso de rustdoc para generar documentacion
-- uso de crate para ver el rendimiento
+# PRIORIDAD BAJA
+9. Crate de rendimiento 
+10. Rustdoc + Documentación
+11. Modo multijugador / IA (solitario)
 
 _- Al terminar la mecanica básica del juego, agregar documentación -_
-
-! HACER CARTEL DEL MENU ! (y asi terminar el menu)
-
-! INDICADOR DEL TURNO ! (implementar)
-! AMBIENTAR CARTAS ! (diseñar)
-
-! CORREGIR ERRORES !
-
-VER CON QUE SEGUIR
