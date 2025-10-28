@@ -5,7 +5,7 @@ use bevy::window::PrimaryWindow;
 use super::component::Deck;
 use crate::game::{card::component::{Card, CardBack, CardHandles, CardPosition, Suit}, gamestate::GameEntity};
 
-pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_back: Res<CardBack>, windows: Query<&Window, With<PrimaryWindow>>,) {
+pub fn spawn_cards(mut commands: Commands, card_handles: Option<Res<CardHandles>>, card_back: Option<Res<CardBack>>, windows: Query<&Window, With<PrimaryWindow>>,) {
     let suits = [Suit::Coarse, Suit::Cup, Suit::Gold, Suit::Sword];
 
     // generate all combinations (suit-value)
@@ -20,6 +20,11 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Res<CardHandles>, card_
 
     // spawn card entities and save in Vec
     let mut card_entities = Vec::new();
+
+    // access CardHandles and CardBack
+    let Some(card_back) = card_back else { return; };
+    let Some(card_handles) = card_handles else { return; };
+
     for (suit, value) in cards {
 
         let suit_idx = match suit {

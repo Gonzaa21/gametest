@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 pub mod component;
-mod system;
+pub mod system;
 mod handles;
 pub mod utils;
 
@@ -9,7 +9,7 @@ pub struct CardPlugin;
 
 impl Plugin for CardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_cards)
+        app.add_systems(OnEnter(AppState::Setup), setup_cards)
         .add_systems(Update, (card_face, configure_texture))
         .add_systems(Update, (card_selection, card_visual).chain().run_if(in_state(AppState::PlayerTurn)))
         .insert_resource(DoubleClick { last_card: None, last_click_time: 0.0, time_limit: 0.4 });

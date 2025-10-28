@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use crate::game::{card::component::{Card, CardPosition}, player::component::Player, hand::component::Hand, gamestate::{AppState, GameEntity}, turn_player::component::Turn, graveyard::component::Graveyard, deck::component::Deck};
+use crate::game::card::component::{CardBack, CardHandles};
 
 // Reveal all cards
 pub fn reveal_all_cards(
@@ -62,6 +63,7 @@ pub fn prepare_new_round(
     deck_query: Query<Entity, With<Deck>>,
     graveyard_query: Query<Entity, With<Graveyard>>,
     mut hand_query: Query<&mut Hand>,
+    player_query: Query<Entity, With<Player>>,
 ) {
     if keyboard.just_pressed(KeyCode::KeyN) {
 
@@ -81,6 +83,13 @@ pub fn prepare_new_round(
         for entity in graveyard_query.iter() {
             commands.entity(entity).despawn();
         }
+        for entity in player_query.iter() {
+            commands.entity(entity).despawn();
+        }
+
+        // removing CardHandles and CardBack
+        commands.remove_resource::<CardHandles>();
+        commands.remove_resource::<CardBack>();
 
         turn.has_drawn_card = false;
         next_state.set(AppState::Setup);
@@ -96,5 +105,10 @@ pub fn cleanup_game_entities(
     for entity in game_entities.iter() {
         commands.entity(entity).despawn();
     }
+
+    // removing CardHandles and CardBack
+    commands.remove_resource::<CardHandles>();
+    commands.remove_resource::<CardBack>();
+    
     info!(target: "mygame", "Game cleaned up");
 }

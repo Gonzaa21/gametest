@@ -1,5 +1,5 @@
 # PRIORIDAD ALTA
-1. correguir errores: sistema de selection, cartas duplicadas y no volteadas al inicio
+1. correguir errores: cartas duplicadas y no volteadas al inicio al poner una nueva partida presionando N
 2. terminar menu principal (cartel del juego) -- *agregar boton de configur. en el futuro
 3. implementar scoreboard
 

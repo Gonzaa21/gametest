@@ -46,9 +46,11 @@ pub fn setup_cards(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 
 pub fn card_face(
-    card_back: Res<CardBack>,
+    card_back: Option<Res<CardBack>>,
     mut query: Query<(&Card, &mut Sprite)>
 ) {
+    let Some(card_back) = card_back else { return; };
+
     for (card, mut sprite) in query.iter_mut() {
         if card.face_up {
             // asign front
