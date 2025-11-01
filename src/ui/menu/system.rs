@@ -74,6 +74,23 @@ pub fn initial_adjust_background(
     }
 }
 
+// spawn logo
+pub fn spawn_logo(
+    mut commands: Commands, 
+    asset_server: Res<AssetServer>,
+    window: Query<&Window, With<PrimaryWindow>>,
+) {
+    let Ok(window) = window.single() else { return; };
+    let logo_handle: Handle<Image> = asset_server.load("textures/ui/Logo.png");
+    
+    // Spawn with default scale
+    commands.spawn((
+        Sprite::from_image(logo_handle.clone()),
+        Transform::from_xyz(0.0, window.height() * 0.25, 1.0).with_scale(Vec3::splat(0.5)),
+        MainMenuUI,
+    ));
+}
+
 // spawn_buttons
 pub fn spawn_buttons(
     mut commands: Commands, 
