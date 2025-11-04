@@ -1,13 +1,13 @@
 # PRIORIDAD ALTA
 1. correguir errores: n/a
-2. terminar menu principal (cartel del juego) -- *agregar boton de configur. en el futuro
+2. *agregar boton de configur. en el futuro
 3. implementar scoreboard
 
 # PRIORIDAD MEDIA
 4. Animaciones de cartas (volteo, repartir, mover)
 5. Efecto de apilado en mazo y pozo
 6. Audio (de fondo + efecto de cartas)
-7. Indicador de turno (UI)
+7. [#Indicador_de_turno_(UI)#]
 8. Ambientar las cartas (diseñar)
 
 # PRIORIDAD BAJA
