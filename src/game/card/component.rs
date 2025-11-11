@@ -15,7 +15,11 @@ pub struct Card {
 #[derive(Component)]
 pub struct Selected;
 
+#[derive(Component)]
+pub struct PreviousCardPosition(pub CardPosition);
+
 // ENUMS
+#[derive(Clone)]
 pub enum CardPosition {
     Deck,
     Hand(Entity),
