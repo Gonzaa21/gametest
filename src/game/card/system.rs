@@ -4,6 +4,7 @@ use crate::game::card::component::{Card, CardPosition, CardHandles, CardBack, Su
 use crate::game::special_cards::resource::SpecialEffect;
 use crate::game::{graveyard::component::Graveyard, turn_player::component::Turn, deck::component::Deck, hand::component::Hand, player::component::Player, special_cards::resource::SpecialCardEffect};
 use crate::game::card::handles::{handle_deck_click, handle_card_click, handle_graveyard_click};
+use crate::ui::card_animation::component::{AnimationType, CardAnimation};
 use bevy::asset::Assets;
 use bevy::image::{Image, ImageSampler};
 use rand::seq::SliceRandom;
@@ -47,11 +48,25 @@ pub fn setup_cards(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn card_face(
     card_back: Option<Res<CardBack>>,
-    mut query: Query<(&Card, &mut Sprite)>
+    mut query: Query<(&Card, &mut Sprite, Option<&CardAnimation>)>
 ) {
     let Some(card_back) = card_back else { return; };
 
-    for (card, mut sprite) in query.iter_mut() {
+    for (card, mut sprite, animation) in query.iter_mut() {
+        if let Some(anim) = animation {
+            if anim.animation_type == AnimationType::Flip {
+                if anim.progress < 0.5 {
+                    // Primera mitad: mantener boca abajo
+                    sprite.image = card_back.0.clone();
+                    continue;
+                } else {
+                    // Segunda mitad: mostrar boca arriba
+                    sprite.image = card.front_face.clone();
+                    continue;
+                }
+            }
+        }
+        
         if card.face_up {
             // asign front
             sprite.image = card.front_face.clone();
