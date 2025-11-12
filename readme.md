@@ -16,3 +16,6 @@
 11. Modo multijugador / IA (solitario)
 
 _- Al terminar la mecanica básica del juego, agregar documentación -_
+
+hoy: hacer la cosita que queda de flip y empezar con move/deal
+siguiente: efecto de apilado y audio

@@ -1,34 +1,53 @@
 use bevy::prelude::*;
-use crate::game::card::component::{Card, CardPosition, PreviousCardPosition};
+use crate::game::card::component::{Card, CardPosition, PreviousCardPosition, PreviousFaceUp};
 use crate::ui::card_animation::component::{CardAnimation, AnimationState, AnimationType};
 
 // detect when face_up change
 pub fn detect_flip(
     mut commands: Commands,
-    card_query: Query<(Entity, &Card, &Transform, Option<&PreviousCardPosition>)>,
+    card_query: Query<(Entity, &Card, &Transform, Option<&PreviousCardPosition>, Option<&PreviousFaceUp>)>,
     animation_query: Query<&CardAnimation>,
 ) {
-    for (entity, card, transform, previous_pos) in card_query.iter() {
+    for (entity, card, transform, previous_pos, previous_face) in card_query.iter() {
         // verify if is animating already
         if animation_query.get(entity).is_ok() {
             continue;
         }
         
         // obtain previous card position
-        let prev = match previous_pos {
+        let prev_pos = match previous_pos {
             Some(p) => &p.0,
             None => {
                 // save position
                 commands.entity(entity).insert(PreviousCardPosition(card.position.clone()));
+                commands.entity(entity).insert(PreviousFaceUp(card.face_up));
                 continue;
             }
         };
         
+        // obtain previous face
+        let prev_face = match previous_face {
+            Some(p) => p.0,
+            None => {
+                commands.entity(entity).insert(PreviousFaceUp(card.face_up));
+                continue;
+            }
+        };
+
+        // verify if have changes
+        let position_changed = prev_pos != &card.position;
+        let face_changed = prev_face != card.face_up;
+
+        if !position_changed && !face_changed {
+            continue; // do nothing if not changed
+        }
+
         // detect when the card must animate
-        let should_animate = match (prev, &card.position) {
+        let should_animate = match (prev_pos, &card.position) {
             (CardPosition::Deck, CardPosition::DrawnCard(_)) => true,
             (CardPosition::DrawnCard(_), CardPosition::Hand(_)) => true,
             (CardPosition::Hand(_), CardPosition::Graveyard) => true,
+            _ if !prev_face && card.face_up && matches!(card.position, CardPosition::Hand(_)) => true,
             _ => false,
         };
         
@@ -45,8 +64,13 @@ pub fn detect_flip(
             });
         }
         
-        // Actualizar posición anterior
-        commands.entity(entity).insert(PreviousCardPosition(card.position.clone()));
+        // update previous position if it changes
+        if position_changed {
+            commands.entity(entity).insert(PreviousCardPosition(card.position.clone()));
+        }
+        if face_changed {
+            commands.entity(entity).insert(PreviousFaceUp(card.face_up));
+        }
     }
 }
 

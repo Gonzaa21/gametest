@@ -18,8 +18,11 @@ pub struct Selected;
 #[derive(Component)]
 pub struct PreviousCardPosition(pub CardPosition);
 
+#[derive(Component)]
+pub struct PreviousFaceUp(pub bool);
+
 // ENUMS
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum CardPosition {
     Deck,
     Hand(Entity),
