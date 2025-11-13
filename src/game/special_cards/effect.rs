@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use rand::{Rng, seq::SliceRandom};
 use crate::game::{special_cards::resource::{SpecialCardEffect, SpecialEffect}, card::component::{Card, CardPosition}, hand::component::Hand, player::component::Player, turn_player::component::Turn};
 use crate::ui::turn_indicator::component::CardOpacity;
+use crate::ui::card_animation::component::{CardAnimation, AnimationState, AnimationType};
 
 pub fn reveal_effect(
     special_effect: Option<ResMut<SpecialCardEffect>>,
@@ -131,6 +132,7 @@ pub fn shuffle_effect(
 }
 
 pub fn swap_effect(
+    mut commands: Commands,
     special_effect: Option<ResMut<SpecialCardEffect>>,
     mut card_query: Query<(Entity, &mut Transform, &mut Card, Option<&mut CardOpacity>), With<Card>>,
     mut hand_query: Query<&mut Hand>,
@@ -161,6 +163,36 @@ pub fn swap_effect(
                     own_card.owner_id = target_id;
                     own_card.position = CardPosition::Hand(target_id.unwrap());
                     own_card.face_up = false;
+
+                    // insert movement card animation
+                    commands.entity(target_card_entity).insert(CardAnimation {
+                        animation_type: AnimationType::Movement,
+                        progress: 0.0,
+                        duration: 0.25,
+                        state: AnimationState::Animating,
+                        original_position: target_pos,  // previous position
+                        original_scale: target_transform.scale,
+                        original_rotation: target_transform.rotation,
+                        target_position: Some(own_pos),  // new position
+                    });
+
+                    // reset position for start from origin
+                    target_transform.translation = target_pos;
+
+                    // Lo mismo para own_card
+                    commands.entity(own_card_entity).insert(CardAnimation {
+                        animation_type: AnimationType::Movement,
+                        progress: 0.0,
+                        duration: 0.25,
+                        state: AnimationState::Animating,
+                        original_position: own_pos,
+                        original_scale: own_transform.scale,
+                        original_rotation: own_transform.rotation,
+                        target_position: Some(target_pos),
+                    });
+
+                    // reset position for start from origin
+                    own_transform.translation = own_pos;
 
                     // update and save changes of player hand with target_card
                     if let Some((_, target_player)) = player_query.iter().find(|(entity, _)| Some(*entity) == target_id) {

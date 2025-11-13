@@ -1,4 +1,4 @@
-use bevy::{ecs::entity::Entity, prelude::{Component, Resource, Handle, Image}};
+use bevy::{ecs::entity::Entity, prelude::{Component, Resource, Handle, Image, Vec3}};
 
 // COMPONENTS
 #[derive(Component)]
@@ -20,6 +20,9 @@ pub struct PreviousCardPosition(pub CardPosition);
 
 #[derive(Component)]
 pub struct PreviousFaceUp(pub bool);
+
+#[derive(Component)]
+pub struct PreviousTranslation(pub Vec3);
 
 // ENUMS
 #[derive(Clone, PartialEq)]

@@ -44,9 +44,6 @@ pub fn detect_flip(
 
         // detect when the card must animate
         let should_animate = match (prev_pos, &card.position) {
-            (CardPosition::Deck, CardPosition::DrawnCard(_)) => true,
-            (CardPosition::DrawnCard(_), CardPosition::Hand(_)) => true,
-            (CardPosition::Hand(_), CardPosition::Graveyard) => true,
             _ if !prev_face && card.face_up && matches!(card.position, CardPosition::Hand(_)) => true,
             _ => false,
         };
@@ -61,6 +58,7 @@ pub fn detect_flip(
                 original_scale: transform.scale,
                 original_position: transform.translation,
                 original_rotation: transform.rotation,
+                target_position: Some(transform.translation),
             });
         }
         

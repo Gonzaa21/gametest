@@ -9,12 +9,13 @@ pub struct CardAnimation {
     pub original_scale: Vec3,
     pub original_position: Vec3,
     pub original_rotation: Quat,
+    pub target_position: Option<Vec3>, 
 }
 
 #[derive(PartialEq)]
 pub enum AnimationType {
     Flip,
-    // Move, Deal para después
+    Movement,
 }
 
 #[derive(PartialEq)]
