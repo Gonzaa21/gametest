@@ -43,9 +43,25 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Option<Res<CardHandles>
             return; 
         };
 
+        // offsets
+        let stack_index = card_entities.len() as f32;  // use card spawned index
+        let max_stack_effect = 15.0;  // first 15 cards add offset
+
+        // Apply offset only if it is one of the first cards
+        let (stack_offset_x, stack_offset_y) = if stack_index < max_stack_effect {
+            (stack_index * 0.4, stack_index * 0.3)
+        } else {
+            // others cards without offset
+            (max_stack_effect * 0.4, max_stack_effect * 0.3)
+        };
+
         let card_entity = commands.spawn((
             Sprite::from_image(card_back.0.clone()),
-            Transform::from_xyz(window.width() * 0.15, window.height() * 0.0, idx as f32).with_scale(Vec3::splat(0.7)),
+            Transform::from_xyz(
+                window.width() * 0.15 + stack_offset_x, 
+                window.height() * 0.0 + stack_offset_y, 
+                idx as f32
+            ).with_scale(Vec3::splat(0.7)),
             Card {
                 suit,
                 value,

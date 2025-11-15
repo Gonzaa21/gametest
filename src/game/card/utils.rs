@@ -24,8 +24,25 @@ pub fn discard_card(
                 // update graveyard
                 if let Ok(mut graveyard) = graveyard_query.single_mut() {
                     graveyard.cards.push(clicked_entity);
-
-                    card_transform.translation = Vec3::new(window.width() * -0.06, window.height() * 0.0, graveyard.cards.len() as f32);
+                    
+                    let stack_index = (graveyard.cards.len() - 1) as f32;
+                    let max_stack = 8.0;
+                    
+                    let (offset_x, offset_y) = if stack_index < max_stack {
+                        (stack_index * 0.5, stack_index * 0.3)
+                    } else {
+                        (max_stack * 0.5, max_stack * 0.3)
+                    };
+                    
+                    // small rotation
+                    let random_rotation = (rand::random::<f32>() - 0.5) * 0.15;  // 4 grades
+                    card_transform.rotation = Quat::from_rotation_z(random_rotation);
+                    
+                    card_transform.translation = Vec3::new(
+                        window.width() * -0.06 + offset_x,
+                        window.height() * 0.0 + offset_y,
+                        10.0 + stack_index
+                    );
 
                     info!(target: "mygame", "Card discarded directly to graveyard: {:?}", clicked_entity);
                 }
@@ -99,7 +116,25 @@ pub fn card_swap(
             let Ok(window) = windows.single() else { return; };
             if let Ok(mut graveyard) = graveyard_query.single_mut() {
                 graveyard.cards.push(clicked_entity); // update changes
-                clicked_transform.translation = Vec3::new(window.width() * -0.06, window.height() * 0.0, graveyard.cards.len() as f32); // position in graveyard
+                
+                let stack_index = (graveyard.cards.len() - 1) as f32;
+                let max_stack = 8.0;
+                        
+                let (offset_x, offset_y) = if stack_index < max_stack {
+                    (stack_index * 0.5, stack_index * 0.3)
+                } else {
+                    (max_stack * 0.5, max_stack * 0.3)
+                };
+                
+                // small rotation
+                let random_rotation = (rand::random::<f32>() - 0.5) * 0.15;
+                clicked_transform.rotation = Quat::from_rotation_z(random_rotation);
+                
+                clicked_transform.translation = Vec3::new(
+                    window.width() * -0.06 + offset_x,
+                    window.height() * 0.0 + offset_y,
+                    10.0 + stack_index
+                );
                 
                 if let Some((_, player)) = player_query.iter().find(|(entity, _)| *entity == turn_query.current_player) {
                     if let Ok(mut hand) = hand_query.get_mut(player.hand) {
