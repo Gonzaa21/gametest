@@ -53,7 +53,8 @@ pub fn spawn_cards(mut commands: Commands, card_handles: Option<Res<CardHandles>
                 owner_id: None,
                 position: CardPosition::Deck,
                 front_face: handle.clone(),
-                from_deck: false
+                from_deck: false,
+                is_being_dealt: false,
             },
             GameEntity,
         )).id();

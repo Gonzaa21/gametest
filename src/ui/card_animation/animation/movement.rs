@@ -65,7 +65,8 @@ pub fn detect_movement(
                 original_scale: transform.scale,
                 original_rotation: transform.rotation,
                 target_position: Some(target_pos),
-                // ...
+                delay: 0.0,
+                delay_elapsed: 0.0,
             });
         }
 

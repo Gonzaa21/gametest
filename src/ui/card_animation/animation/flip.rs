@@ -59,6 +59,8 @@ pub fn detect_flip(
                 original_position: transform.translation,
                 original_rotation: transform.rotation,
                 target_position: Some(transform.translation),
+                delay: 0.0,
+                delay_elapsed: 0.0,
             });
         }
         

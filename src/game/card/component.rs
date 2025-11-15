@@ -9,7 +9,8 @@ pub struct Card {
     pub position: CardPosition,
     pub suit: Suit,
     pub front_face: Handle<Image>,
-    pub from_deck: bool
+    pub from_deck: bool,
+    pub is_being_dealt: bool,
 }
 
 #[derive(Component)]

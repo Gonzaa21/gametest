@@ -174,12 +174,13 @@ pub fn swap_effect(
                         original_scale: target_transform.scale,
                         original_rotation: target_transform.rotation,
                         target_position: Some(own_pos),  // new position
+                        delay: 0.0,
+                        delay_elapsed: 0.0,
                     });
 
                     // reset position for start from origin
                     target_transform.translation = target_pos;
 
-                    // Lo mismo para own_card
                     commands.entity(own_card_entity).insert(CardAnimation {
                         animation_type: AnimationType::Movement,
                         progress: 0.0,
@@ -189,6 +190,8 @@ pub fn swap_effect(
                         original_scale: own_transform.scale,
                         original_rotation: own_transform.rotation,
                         target_position: Some(target_pos),
+                        delay: 0.0,
+                        delay_elapsed: 0.0,
                     });
 
                     // reset position for start from origin

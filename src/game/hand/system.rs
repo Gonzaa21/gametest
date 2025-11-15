@@ -6,8 +6,10 @@ use super::component::Hand;
 use crate::game::deck::component::Deck;
 use crate::game::player::component::Player;
 use crate::game::card::component::{Card, CardPosition};
+use crate::ui::card_animation::component::{CardAnimation, AnimationType, AnimationState};
 
 pub fn deal_initial_hands (
+    mut commands: Commands,
     mut deck_query: Query<&mut Deck, With<Deck>>,
     player_query: Query<(Entity, &Player), With<Player>>,
     mut card_query: Query<(&mut Card, &mut Transform)>,
@@ -42,15 +44,41 @@ pub fn deal_initial_hands (
             _ => get_player_positions(0, window.width(), window.height()),// default
         };
 
+        // obtain deck position
+        let deck_position = Vec3::new(window.width() * 0.15, 0.0, 20.0);
+
         // iterate deck cards and distribute it to players
         for (j, &card_e) in hand_cards.iter().enumerate() {
             if let Ok((mut card, mut tf)) = card_query.get_mut(card_e) {
                 card.owner_id = Some(player_entity);
                 card.position = CardPosition::Hand(player_entity);
                 card.face_up  = i == 0 && j < 2;
-            
-                tf.translation = positions[j];
+                card.is_being_dealt = true;
+
+                let target_pos = positions[j]; // save target position
+                
+                tf.translation = deck_position; // start cards in deck
                 tf.scale = Vec3::splat(0.7);
+
+                // calculate delay
+                let delay = (i * 4 + j) as f32 * 0.15;
+
+                info!(target: "mygame", "Setting up card {} for player {}: delay={}, target={:?}", 
+                j, i, delay, target_pos);
+                
+                // insert deal animation
+                commands.entity(card_e).insert(CardAnimation {
+                    animation_type: AnimationType::Deal,
+                    progress: 0.0,
+                    duration: 0.3,
+                    state: AnimationState::WaitingToStart,  // o Animating
+                    original_position: deck_position,
+                    original_scale: tf.scale,
+                    original_rotation: tf.rotation,
+                    target_position: Some(target_pos),
+                    delay: delay,
+                    delay_elapsed: 0.0,
+                });
             }
         }
 

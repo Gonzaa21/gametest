@@ -21,8 +21,8 @@ pub fn detect_special_card(
     let drawn_card = card_query.iter()
         .find(|(_, card)| {
             matches!(card.position, CardPosition::DrawnCard(player_id) 
-                 if player_id == turn_query.current_player)
-                 && card.from_deck
+                if player_id == turn_query.current_player)
+                && card.from_deck
         });
 
     if let Some((card_entity, card)) = drawn_card {
