@@ -11,13 +11,13 @@ pub fn animate_deal(
         
         if animation.animation_type == AnimationType::Deal {
             
-            // Fase 1: Esperar delay
+            // wait delay
             if animation.delay_elapsed < animation.delay {
                 animation.delay_elapsed += time.delta_secs();
                 continue;
             }
             
-            // Fase 2: Animar
+            // animate
             if let Some(target) = animation.target_position {
                 // Interpolate con easing
                 let t = animation.progress * animation.progress * (3.0 - 2.0 * animation.progress);
@@ -26,13 +26,13 @@ pub fn animate_deal(
                 // Update progress
                 animation.progress += time.delta_secs() / animation.duration;
                 
-                // Fase 3: Cuando termina
+                // when animation finish
                 if animation.progress >= 1.0 {
                     card.is_being_dealt = false;
-                    transform.translation = target;  // Posición final exacta
+                    transform.translation = target;  // final position
                     transform.translation.z = 10.0;
                     
-                    // Si debe flip (2 primeras cartas)
+                    // to do flip
                     if card.face_up {
                         commands.entity(entity).insert(CardAnimation {
                             animation_type: AnimationType::Flip,
@@ -47,7 +47,7 @@ pub fn animate_deal(
                             delay_elapsed: 0.0,
                         });
                     } else {
-                        // Si no flip, solo remover animación
+                        // if not flip, remove animation
                         commands.entity(entity).remove::<CardAnimation>();
                     }
                 }
