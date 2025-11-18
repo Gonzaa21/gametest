@@ -26,7 +26,7 @@ pub struct PreviousFaceUp(pub bool);
 pub struct PreviousTranslation(pub Vec3);
 
 // ENUMS
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum CardPosition {
     Deck,
     Hand(Entity),

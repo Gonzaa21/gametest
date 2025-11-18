@@ -10,40 +10,19 @@ pub fn discard_card(
     graveyard_query: &mut Query<&mut Graveyard>,
     turn_query: ResMut<Turn>,
     player_query: &Query<(Entity, &Player)>,
-    windows: Query<&Window, With<PrimaryWindow>>,
     commands: &mut Commands,
     selected_query: &Query<Entity, With<Selected>>,
 ) {
     if let Ok((_, _transform, card)) = card_query.get_mut(clicked_entity) {
         if matches!(card.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
-            if let Ok((_, mut card_transform, mut card)) = card_query.get_mut(clicked_entity) {
+            if let Ok((_, _, mut card)) = card_query.get_mut(clicked_entity) {
                 card.position = CardPosition::Graveyard;
                 card.face_up = true;
+                card.is_being_dealt = true;
 
-                let Ok(window) = windows.single() else { return; };
                 // update graveyard
                 if let Ok(mut graveyard) = graveyard_query.single_mut() {
                     graveyard.cards.push(clicked_entity);
-                    
-                    let stack_index = (graveyard.cards.len() - 1) as f32;
-                    let max_stack = 8.0;
-                    
-                    let (offset_x, offset_y) = if stack_index < max_stack {
-                        (stack_index * 0.5, stack_index * 0.3)
-                    } else {
-                        (max_stack * 0.5, max_stack * 0.3)
-                    };
-                    
-                    // small rotation
-                    let random_rotation = (rand::random::<f32>() - 0.5) * 0.15;  // 4 grades
-                    card_transform.rotation = Quat::from_rotation_z(random_rotation);
-                    
-                    card_transform.translation = Vec3::new(
-                        window.width() * -0.06 + offset_x,
-                        window.height() * 0.0 + offset_y,
-                        10.0 + stack_index
-                    );
-
                     info!(target: "mygame", "Card discarded directly to graveyard: {:?}", clicked_entity);
                 }
 

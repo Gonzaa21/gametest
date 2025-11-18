@@ -25,7 +25,7 @@ pub fn handle_card_click(
 
     if let Some(card_comp) = card_comp {
         if matches!(card_comp.position, CardPosition::DrawnCard(player_id) if player_id == turn_query.current_player) {
-            discard_card(clicked_entity, card_query, graveyard_query, turn_query, player_query, windows, commands, selected_query);
+            discard_card(clicked_entity, card_query, graveyard_query, turn_query, player_query, commands, selected_query);
             return;
         }
     }
@@ -69,7 +69,6 @@ pub fn handle_deck_click(
     mut deck_query: Query<&mut Deck>,
     mut turn_query: ResMut<Turn>,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
-    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
     // verify if player already drew a card
     if turn_query.has_drawn_card {
@@ -93,15 +92,14 @@ pub fn handle_deck_click(
     }
 
     let drawn_card_entity = deck.cards_values.remove(0); // take first card of the deck
-    let Ok(window) = windows.single() else { return; };
 
-    if let Ok((_, mut transform, mut card)) = card_query.get_mut(drawn_card_entity) {
+    if let Ok((_, _, mut card)) = card_query.get_mut(drawn_card_entity) {
+        card.is_being_dealt = true;
         card.position = CardPosition::DrawnCard(turn_query.current_player);
         card.owner_id = Some(turn_query.current_player);
         card.face_up = true; // show card taken
         card.from_deck = true; // card taken from deck
         
-        transform.translation = Vec3::new(window.width() * 0.1, 0.0, 30.0); // card taken position
         turn_query.has_drawn_card = true; // player already drew a card
         info!(target: "mygame", "Player {:?} drew card: {:?}", turn_query.current_player, drawn_card_entity);
     }
@@ -111,7 +109,6 @@ pub fn handle_graveyard_click(
     mut graveyard_query: Query<&mut Graveyard>,
     mut turn_query: ResMut<Turn>,
     card_query: &mut Query<(Entity, &mut Transform, &mut Card), With<Card>>,
-    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
     // verify if player already drew a card
     if turn_query.has_drawn_card {
@@ -143,15 +140,13 @@ pub fn handle_graveyard_click(
         }
     };
 
-    let Ok(window) = windows.single() else { return; };
-
-    if let Ok((_, mut transform, mut card)) = card_query.get_mut(drawn_card_entity) {
+    if let Ok((_, _, mut card)) = card_query.get_mut(drawn_card_entity) {
+        card.is_being_dealt = true;
         card.position = CardPosition::DrawnCard(turn_query.current_player);
         card.owner_id = Some(turn_query.current_player);
         card.face_up = true; // show card taken
         card.from_deck = false; // card not taken from deck
 
-        transform.translation = Vec3::new(window.width() * 0.1, 0.0, 30.0); // card taken position
         turn_query.has_drawn_card = true; // player already drew a card
         info!(target: "mygame", "Player {:?} drew card: {:?}", turn_query.current_player, drawn_card_entity);
     }

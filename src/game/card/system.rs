@@ -165,13 +165,13 @@ pub fn card_selection(
 
     // detect click in deck
     if detect_deck_click(world_pos, window) {
-        handle_deck_click(deck_query, turn_query, &mut card_query, windows);
+        handle_deck_click(deck_query, turn_query, &mut card_query);
         return;
     }
 
     // detect click in graveyard 
     if detect_graveyard_click(world_pos, window) {
-        handle_graveyard_click(graveyard_query, turn_query, &mut card_query, windows);
+        handle_graveyard_click(graveyard_query, turn_query, &mut card_query);
         return;
     }
 

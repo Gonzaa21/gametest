@@ -23,7 +23,7 @@ pub enum AnimationType {
 
 #[derive(PartialEq)]
 pub enum AnimationState {
-    Idle,
+    // Idle,
     Animating,
     WaitingToStart,
 }
