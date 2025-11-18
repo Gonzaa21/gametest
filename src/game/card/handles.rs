@@ -76,6 +76,14 @@ pub fn handle_deck_click(
         return;
     }
 
+    // there's already a card on drawn_card, ignore click
+    let has_drawn_card = card_query.iter()
+        .any(|(_, _, card)| matches!(card.position, CardPosition::DrawnCard(_)));
+    
+    if has_drawn_card {
+        return;
+    }
+
     // obtain deck
     let mut deck = match deck_query.single_mut() {
         Ok(d) => d,
@@ -113,6 +121,14 @@ pub fn handle_graveyard_click(
     // verify if player already drew a card
     if turn_query.has_drawn_card {
         info!(target: "mygame", "Player already drew a card this turn");
+        return;
+    }
+
+    // there's already a card on drawn_card, ignore click
+    let has_drawn_card = card_query.iter()
+        .any(|(_, _, card)| matches!(card.position, CardPosition::DrawnCard(_)));
+    
+    if has_drawn_card {
         return;
     }
 
