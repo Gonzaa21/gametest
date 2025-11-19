@@ -1,8 +1,5 @@
 # PRIORIDAD ALTA
-1. correguir errores: 
-    bug en drawn_card al clickear el deck rapidamente
-    bug de la animacion deal que al repartir se ve una carta debajo del deck que cuando termina la animacion desaparece
-    bug que se ve la carta por un segundo antes de hacer la animacion de movement
+1. correguir errores: n/a
 2. *agregar boton de configur. en el futuro
 3. implementar scoreboard
 
@@ -19,6 +16,3 @@
 11. Modo multijugador / IA (solitario)
 
 _- Al terminar la mecanica básica del juego, agregar documentación -_
-
-se resuelve el 3er bug pero solo en un caso
-hoy: resolver por completo el bug y empezar a resolver los otros

@@ -4,19 +4,26 @@ use crate::ui::card_animation::component::{CardAnimation, AnimationType, Animati
 
 pub fn animate_deal(
     mut commands: Commands,
-    mut card_query: Query<(Entity, &mut Transform, &mut CardAnimation, &mut Card)>,
+    mut card_query: Query<(Entity, &mut Transform, &mut Sprite, &mut CardAnimation, &mut Card)>,
     time: Res<Time>,
 ) {
-    for (entity, mut transform, mut animation, mut card) in card_query.iter_mut() {
+    for (entity, mut transform, mut sprite, mut animation, mut card) in card_query.iter_mut() {
         
         if animation.animation_type == AnimationType::Deal {
             
             // wait delay
             if animation.delay_elapsed < animation.delay {
+                transform.translation.z = -10.0; // keep Z down
+                sprite.color = Color::srgba(1.0, 1.0, 1.0, 0.0);
                 animation.delay_elapsed += time.delta_secs();
                 continue;
             }
             
+            if animation.progress == 0.0 {
+                transform.translation.z = 100.0;  // visible during the animation
+                sprite.color = Color::WHITE;
+            }
+
             // animate
             if let Some(target) = animation.target_position {
                 // Interpolate con easing
